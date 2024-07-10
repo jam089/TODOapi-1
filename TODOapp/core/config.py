@@ -1,5 +1,4 @@
-from pydantic_settings import BaseSettings
-from pydantic import BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseModel, PostgresDsn
 
 
@@ -22,6 +21,13 @@ class DBCfg(BaseModel):
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=[".env.template", ".env"],
+        case_sensitive=False,
+        env_nested_delimiter="__",
+        env_prefix="TODOAPP__",
+    )
+
     run: RunCfg = RunCfg()
     api: APICfg = APICfg()
     db: DBCfg
