@@ -21,6 +21,6 @@ class Task(Base):
         default=settings.tstat.pld,
         server_default=settings.tstat.pld,
     )
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
     user: Mapped["User"] = relationship(back_populates="tasks")
