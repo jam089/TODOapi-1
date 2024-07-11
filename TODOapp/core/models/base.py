@@ -18,4 +18,4 @@ class Base(DeclarativeBase):
         default=datetime.now(),
         server_default=func.now(),
     )
-    last_update_at: Mapped[datetime | None] = mapped_column(onupdate=func.now())
+    last_update_at: Mapped[datetime | None]
