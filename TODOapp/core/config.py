@@ -20,6 +20,13 @@ class DBCfg(BaseModel):
     max_overflow: int = 10
 
 
+class TaskStatuses(BaseModel):
+    pld: str = "Planned"  # Planned
+    atw: str = "At work"  # At work
+    cmp: str = "Completed"  # Completed
+    dly: str = "Delayed"  # Delayed
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=[".env.template", ".env"],
@@ -30,6 +37,7 @@ class Settings(BaseSettings):
 
     run: RunCfg = RunCfg()
     api: APICfg = APICfg()
+    tstat: TaskStatuses = TaskStatuses()
     db: DBCfg
 
 
