@@ -10,18 +10,18 @@ class BaseUser(BaseModel):
     active: bool | None = None
 
 
-class CreateUser(BaseUser):
+class CreateUserSchm(BaseUser):
     password: str | bytes
 
 
-class UpdateUser(BaseUser):
+class UpdateUserSchm(BaseUser):
     username: str | None = None
     name: str | None = None
     b_date: date | None = None
     active: bool | None = None
 
 
-class User(BaseUser):
+class UserSchm(BaseUser):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

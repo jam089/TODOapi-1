@@ -7,7 +7,7 @@ class BaseTask(BaseModel):
     pass
 
 
-class CreateTask(BaseTask):
+class CreateTaskSchm(BaseTask):
     name: str
     description: str | None = None
     start_at: datetime | None = None
@@ -16,7 +16,7 @@ class CreateTask(BaseTask):
     user_id: int
 
 
-class UpdateTask(BaseTask):
+class UpdateTaskSchm(BaseTask):
     name: str | None = None
     description: str | None = None
     start_at: datetime | None = None
@@ -25,11 +25,11 @@ class UpdateTask(BaseTask):
     status: str | None = None
 
 
-class ChangeTaskUser(BaseTask):
+class ChangeTaskUserSchm(BaseTask):
     user_id: int
 
 
-class Task(CreateTask):
+class TaskSchm(CreateTask):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
