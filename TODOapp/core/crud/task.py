@@ -13,6 +13,6 @@ from api.schemas import (
 
 
 async def get_all_tasks(session: AsyncSession) -> Sequence[Task]:
-    stmt = select(Task).order_by(Task.user_id)
+    stmt = select(Task).order_by(Task.user_id, Task.id)
     result: ScalarResult = await session.scalars(stmt)
     return result.all()
