@@ -99,3 +99,11 @@ async def change_task_user_by_user_id(
     await session.commit()
     await session.refresh(task_to_update)
     return task_to_update
+
+
+async def delete_task(
+    session: AsyncSession,
+    task_to_delete: Task,
+) -> None:
+    await session.delete(task_to_delete)
+    await session.commit()
