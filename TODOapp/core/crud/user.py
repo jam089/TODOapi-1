@@ -26,3 +26,16 @@ async def create_user(
     await session.commit()
     await session.refresh(new_user)
     return new_user
+
+
+async def update_user(
+    session: AsyncSession,
+    user_to_update: User,
+    user_input: UpdateUserSchm,
+) -> User:
+    for name, value in user_input.model_dump(exclude_unset=True).items():
+        setattr(user_to_update, name, value)
+
+    await session.commit()
+    await session.refresh(user_to_update)
+    return user_to_update
