@@ -64,3 +64,16 @@ async def create_task(
     await session.commit()
     await session.refresh(new_task)
     return new_task
+
+
+async def update_task(
+    session: AsyncSession,
+    task_to_update: Task,
+    task_in: UpdateTaskSchm,
+) -> Task:
+    for name, value in task_in.model_dump(exclude_unset=True).items():
+        setattr(task_to_update, name, value)
+
+    await session.commit()
+    await session.refresh(task_to_update)
+    return task_to_update
