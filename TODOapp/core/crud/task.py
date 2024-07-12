@@ -88,3 +88,14 @@ async def change_task_user_by_user(
     await session.commit()
     await session.refresh(task_to_update)
     return task_to_update
+
+
+async def change_task_user_by_user_id(
+    session: AsyncSession,
+    task_to_update: Task,
+    new_user_id: ChangeTaskUserSchm,
+) -> Task:
+    task_to_update.user_id = new_user_id.user_id
+    await session.commit()
+    await session.refresh(task_to_update)
+    return task_to_update
