@@ -29,3 +29,22 @@ async def get_task_by_user(
     stmt = select(Task).where(Task.user_id == user.id).order_by(Task.id)
     result: ScalarResult = await session.scalars(stmt)
     return result.all()
+
+
+async def get_tasks_by_some_statement(
+    session: AsyncSession,
+    search_task: SearchTaskSchm,
+) -> Sequence[Task] | None:
+    condition = []
+    if search_task.id is not None:
+        condition.append(Task.id == search_task.id)
+    if search_task.name is not None:
+        condition.append(Task.name == search_task.name)
+    if search_task.start_at is not None:
+        condition.append(Task.start_at >= search_task.id)
+    if search_task.end_at is not None:
+        condition.append(Task.end_at <= search_task.end_at)
+
+    stmt = select(Task).where(*condition).order_by(Task.id)
+    result: ScalarResult = await session.scalars(stmt)
+    return result.all()
