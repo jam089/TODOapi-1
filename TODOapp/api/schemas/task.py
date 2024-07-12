@@ -13,7 +13,6 @@ class CreateTaskSchm(BaseTask):
     start_at: datetime | None = None
     end_at: datetime | None = None
     scheduled_hours: int
-    user_id: int
 
 
 class UpdateTaskSchm(BaseTask):
