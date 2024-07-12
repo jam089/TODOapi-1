@@ -29,7 +29,6 @@ class ChangeTaskUserSchm(BaseTask):
     user_id: int
 
 
-class TaskSchm(CreateTask):
 class SearchTaskSchm(BaseTask):
     id: int | None = None
     name: str | None = None
@@ -37,6 +36,7 @@ class SearchTaskSchm(BaseTask):
     end_at: datetime | None = None
 
 
+class TaskSchm(CreateTaskSchm):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
