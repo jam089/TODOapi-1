@@ -1,10 +1,15 @@
 from typing import Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, Result, ScalarResult
+from sqlalchemy import select, ScalarResult
 
-from core.models import Task
-from api.schemas import CreateTaskSchm, UpdateTaskSchm, ChangeTaskUserSchm
+from core.models import Task, User
+from api.schemas import (
+    CreateTaskSchm,
+    UpdateTaskSchm,
+    ChangeTaskUserSchm,
+    SearchTaskSchm,
+)
 
 
 async def get_all_tasks(session: AsyncSession) -> Sequence[Task]:
