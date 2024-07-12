@@ -17,6 +17,16 @@ async def get_user_by_id(session: AsyncSession, user_id: int) -> User | None:
     return await session.get(User, user_id)
 
 
+async def get_user_by_username(
+    session: AsyncSession,
+    username: str,
+) -> User | None:
+    stmt = select(User).where(User.username == username)
+    result: Result = await session.execute(stmt)
+    user: User | None = result.one_or_none()
+    return user
+
+
 async def create_user(
     session: AsyncSession,
     user_input: CreateUserSchm,
