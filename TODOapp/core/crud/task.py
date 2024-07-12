@@ -48,3 +48,19 @@ async def get_tasks_by_some_statement(
     stmt = select(Task).where(*condition).order_by(Task.id)
     result: ScalarResult = await session.scalars(stmt)
     return result.all()
+
+
+async def create_task(
+    session: AsyncSession,
+    task_input: CreateTaskSchm,
+    user: User,
+) -> Task:
+    new_task_dict = {
+        "user_id": user.id,
+        **task_input.model_dump(),
+    }
+    new_task = Task(**new_task_dict)
+    session.add(new_task)
+    await session.commit()
+    await session.refresh(new_task)
+    return new_task
