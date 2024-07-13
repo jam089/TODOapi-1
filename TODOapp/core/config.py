@@ -8,8 +8,20 @@ class RunCfg(BaseModel):
     reload: bool = True
 
 
+class UserAPI(BaseModel):
+    prefix: str = "/user"
+    tag: str = "User"
+
+
+class TaskAPI(BaseModel):
+    prefix: str = "/task"
+    tag: str = "Task"
+
+
 class APICfg(BaseModel):
     prefix: str = "/api"
+    user: UserAPI = UserAPI()
+    task: TaskAPI = TaskAPI()
 
 
 class DBCfg(BaseModel):
