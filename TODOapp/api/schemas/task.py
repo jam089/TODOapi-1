@@ -40,3 +40,8 @@ class TaskSchm(CreateTaskSchm):
 
     id: int
     status: str
+
+
+class TaskSchmExtended(TaskSchm):
+    created_at: datetime
+    last_update_at: datetime

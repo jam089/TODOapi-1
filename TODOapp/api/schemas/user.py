@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict
 
@@ -25,3 +25,8 @@ class UserSchm(BaseUser):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+
+
+class UserSchmExtended(UserSchm):
+    created_at: datetime
+    last_update_at: datetime
