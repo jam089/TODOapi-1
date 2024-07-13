@@ -29,7 +29,7 @@ class DatabaseHelper:
         self.session_factory = async_sessionmaker(
             bind=self.engine,
             autoflush=False,
-            autocommite=False,
+            autocommit=False,
             expire_on_commit=False,
         )
 
