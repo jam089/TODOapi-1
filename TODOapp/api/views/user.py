@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import db_helper
-from api.schemas import UserSchm, UserSchmExtended
+from api.schemas import UserSchm, UserSchmExtended, CreateUserSchm
 from core.crud import user
 
 router = APIRouter()
@@ -33,3 +33,11 @@ async def get_all_user_and_by_id(
         return await user.get_user_by_id(session, id)
 
     return await user.get_all_users(session)
+
+
+@router.post("/", response_model=UserSchm)
+async def create_user(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    user_to_create: CreateUserSchm,
+):
+    return await user.create_user(session, user_to_create)
