@@ -49,7 +49,11 @@ async def get_all_user_and_by_id(
     return await user.get_all_users(session)
 
 
-@router.post("/", response_model=UserSchm)
+@router.post(
+    "/",
+    response_model=UserSchm,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_user(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user_to_create: CreateUserSchm,
