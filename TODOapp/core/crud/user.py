@@ -23,7 +23,7 @@ async def get_user_by_username(
 ) -> User | None:
     stmt = select(User).where(User.username == username)
     result: Result = await session.execute(stmt)
-    user: User | None = result.one_or_none()
+    user: User | None = result.scalar_one_or_none()
     return user
 
 
