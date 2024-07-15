@@ -38,7 +38,13 @@ async def get_all_user_and_by_id(
     id: Annotated[int, Path] | None = None,
 ):
     if id:
-        return await user.get_user_by_id(session, id)
+        user_by_id: UpdateUserSchm | None = await user.get_user_by_id(session, id)
+        if user_by_id:
+            return user_by_id
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"user with id=[{int(id)}] not found",
+        )
 
     return await user.get_all_users(session)
 
