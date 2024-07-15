@@ -7,7 +7,6 @@ class BaseUser(BaseModel):
     username: str
     name: str | None = None
     b_date: date | None = None
-    active: bool | None = None
 
 
 class CreateUserSchm(BaseUser):
@@ -25,6 +24,7 @@ class UserSchm(BaseUser):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    active: bool
 
 
 class UserSchmExtended(UserSchm):
