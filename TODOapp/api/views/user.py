@@ -1,6 +1,6 @@
 from typing import Sequence, Annotated, Union
 
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import db_helper
@@ -15,7 +15,15 @@ async def get_user_by_username(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     username: str,
 ):
-    return await user.get_user_by_username(session, username)
+    user_by_username: UserModel | None = await user.get_user_by_username(
+        session, username
+    )
+    if user_by_username:
+        return user_by_username
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"user {username!r} not found",
+    )
 
 
 @router.get(
