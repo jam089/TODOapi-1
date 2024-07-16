@@ -6,6 +6,8 @@ services:
       POSTGRES_DB: todo_app
       POSTGRES_USER: pgadmin
       POSTGRES_PASSWORD: pgadmin
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
@@ -13,3 +15,7 @@ services:
     image: adminer
     ports:
       - "8080:8080"
+
+volumes:
+  pgdata:
+    driver: local
