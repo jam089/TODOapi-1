@@ -59,3 +59,9 @@ async def create_user(
     user_to_create: CreateUserSchm,
 ):
     return await user.create_user(session, user_to_create)
+    if not await user.get_user_by_username(session, user_to_create.username):
+        return await user.create_user(session, user_to_create)
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail=f"{user_to_create.username} already exist",
+    )
