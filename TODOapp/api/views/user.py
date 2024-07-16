@@ -80,3 +80,14 @@ async def update_user(
         status_code=status.HTTP_409_CONFLICT,
         detail=f"{user_input.username} already exist",
     )
+
+
+@router.delete(
+    "/",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_user(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    user_to_delete: Annotated[UserModel, Depends(deps.get_user)],
+) -> None:
+    await user.delete_user(session, user_to_delete)
