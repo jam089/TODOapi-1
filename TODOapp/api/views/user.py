@@ -3,8 +3,10 @@ from typing import Sequence, Annotated, Union
 from fastapi import APIRouter, Depends, Path, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.schemas import UserSchm, UserSchmExtended, CreateUserSchm, UpdateUserSchm
+from api import deps
 from core.models import db_helper
-from api.schemas import UserSchm, UserSchmExtended, CreateUserSchm
+from core.models import User as UserModel
 from core.crud import user
 
 router = APIRouter()
@@ -58,10 +60,23 @@ async def create_user(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user_to_create: CreateUserSchm,
 ):
-    return await user.create_user(session, user_to_create)
     if not await user.get_user_by_username(session, user_to_create.username):
         return await user.create_user(session, user_to_create)
     raise HTTPException(
         status_code=status.HTTP_409_CONFLICT,
         detail=f"{user_to_create.username} already exist",
+    )
+
+
+@router.patch("/", response_model=UserSchm)
+async def update_user(
+    user_input: UpdateUserSchm,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    user_to_update: Annotated[UserModel, Depends(deps.get_user)],
+):
+    if not await user.get_user_by_username(session, user_input.username):
+        return await user.update_user(session, user_to_update, user_input)
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail=f"{user_input.username} already exist",
     )
