@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, UTC
 
 import jwt
+import bcrypt
 
 from core.config import settings
 
@@ -37,3 +38,9 @@ def decode_jwt(
         algorithms=[algorithm],
     )
     return decoded
+
+
+def hash_password(
+    password: str,
+) -> bytes:
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
