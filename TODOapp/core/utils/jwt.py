@@ -24,3 +24,16 @@ def encode_jwt(
     )
     token = jwt.encode(payload=to_payload, key=private_key, algorithm=algorithm)
     return token
+
+
+def decode_jwt(
+    token: str | bytes,
+    public_key: str = settings.auth_jwt.public_key_path.read_text(),
+    algorithm: str = settings.auth_jwt.algorithm,
+) -> dict:
+    decoded = jwt.decode(
+        jwt=token,
+        key=public_key,
+        algorithms=[algorithm],
+    )
+    return decoded
