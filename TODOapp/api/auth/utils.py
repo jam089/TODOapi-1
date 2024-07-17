@@ -26,15 +26,28 @@ def create_token(
     )
 
 
-def create_access_token(user: UserSchm):
+def create_access_token(user: UserSchm) -> str:
     jwt_payload = {
         "sub": user.id,
         "username": user.username,
         "name": user.name,
-        "logged_in_at": datetime.now(UTC)
+        "logged_in_at": datetime.now(UTC),
     }
     return create_token(
         token_type=ACCESS_TOKEN_TYPE,
         payload=jwt_payload,
         expire_minutes=settings.auth_jwt.access_token_expire_minutes,
+    )
+
+
+def create_refresh_token(user: UserSchm):
+    jwt_payload = {
+        "sub": user.id,
+    }
+    return create_token(
+        token_type=REFRESH_TOKEN_TYPE,
+        payload=jwt_payload,
+        expire_timedelta=timedelta(
+            days=settings.auth_jwt.refresh_token_expire_days,
+        ),
     )
