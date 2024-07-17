@@ -9,6 +9,7 @@ __all__ = (
     "SearchTaskSchm",
     "UserSchmExtended",
     "TaskSchmExtended",
+    "TokenInfoSchm",
 )
 
 from .user import CreateUserSchm, UpdateUserSchm, UserSchm, UserSchmExtended
@@ -20,3 +21,4 @@ from .task import (
     SearchTaskSchm,
     TaskSchmExtended,
 )
+from .token import TokenInfoSchm
