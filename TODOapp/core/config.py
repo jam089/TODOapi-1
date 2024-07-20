@@ -12,6 +12,31 @@ class RunCfg(BaseModel):
     reload: bool = True
 
 
+class DBCfg(BaseModel):
+    url: PostgresDsn
+    echo: bool = False
+    echo_pool: bool = False
+    pool_size: int = 50
+    max_overflow: int = 10
+
+
+class TaskStatuses(BaseModel):
+    pld: str = "Planned"  # Planned
+    atw: str = "At work"  # At work
+    cmp: str = "Completed"  # Completed
+    dly: str = "Delayed"  # Delayed
+
+
+class AuthJWT(BaseModel):
+    private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
+    public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
+    algorithm: str = "RS256"
+    access_token_expire_minutes: int = 3
+    refresh_token_expire_days: int = 40
+    prefix: str = "/auth"
+    tag: str = "Auth"
+
+
 class UserAPI(BaseModel):
     prefix: str = "/user"
     tag: str = "User"
@@ -26,29 +51,7 @@ class APICfg(BaseModel):
     prefix: str = "/api"
     user: UserAPI = UserAPI()
     task: TaskAPI = TaskAPI()
-
-
-class DBCfg(BaseModel):
-    url: PostgresDsn
-    echo: bool = False
-    echo_pool: bool = False
-    pool_size: int = 50
-    max_overflow: int = 10
-
-
-class AuthJWT(BaseModel):
-    private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
-    public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
-    algorithm: str = "RS256"
-    access_token_expire_minutes: int = 3
-    refresh_token_expire_days: int = 40
-
-
-class TaskStatuses(BaseModel):
-    pld: str = "Planned"  # Planned
-    atw: str = "At work"  # At work
-    cmp: str = "Completed"  # Completed
-    dly: str = "Delayed"  # Delayed
+    auth_jwt: AuthJWT = AuthJWT()
 
 
 class Settings(BaseSettings):
@@ -62,7 +65,6 @@ class Settings(BaseSettings):
     run: RunCfg = RunCfg()
     api: APICfg = APICfg()
     tstat: TaskStatuses = TaskStatuses()
-    auth_jwt: AuthJWT = AuthJWT()
     db: DBCfg
 
 
