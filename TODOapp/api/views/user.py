@@ -3,6 +3,7 @@ from typing import Sequence, Annotated, Union
 from fastapi import APIRouter, Depends, Path, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.auth.validation import get_currant_auth_user
 from api.schemas import UserSchm, UserSchmExtended, CreateUserSchm, UpdateUserSchm
 from api import deps
 from core.models import db_helper
@@ -10,6 +11,13 @@ from core.models import User as UserModel
 from core.crud import user
 
 router = APIRouter()
+
+
+@router.get("/profile/", response_model=UserSchmExtended)
+async def get_profile(
+    current_user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
+):
+    return current_user
 
 
 @router.get("/{username}/", response_model=UserSchm)
