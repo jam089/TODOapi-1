@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.auth.validation import get_currant_auth_user, get_currant_auth_user_with_admin
 from api.schemas import UserSchm, UserSchmExtended, CreateUserSchm, UpdateUserSchm
 from api import deps
+from api.schemas.user import UserPassChangeSchm, UserRoleChangeSchm
 from core.config import settings
 from core.models import db_helper
 from core.models import User as UserModel
@@ -83,6 +84,23 @@ async def create_user(
     raise HTTPException(
         status_code=status.HTTP_409_CONFLICT,
         detail=f"{user_to_create.username} already exist",
+    )
+
+
+@router.patch("/change_password/", response_model=UserSchmExtended)
+async def change_your_password(
+    new_password: UserPassChangeSchm,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    current_user: Annotated[
+        UserSchmExtended,
+        Depends(get_currant_auth_user),
+    ],
+):
+    user_to_update = await user.get_user_by_id(session, current_user.id)
+    return await user.update_password(
+        session=session,
+        user_to_update=user_to_update,
+        password=new_password.password,
     )
 
 
