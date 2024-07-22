@@ -104,6 +104,26 @@ async def change_your_password(
     )
 
 
+@router.patch("/{user_id}/role/", response_model=UserSchmExtended)
+async def change_role(
+    new_role: UserRoleChangeSchm,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    user_to_update: Annotated[UserModel, Depends(deps.get_user)],
+    current_user: Annotated[
+        UserSchmExtended,
+        Depends(get_currant_auth_user_with_admin),
+    ],
+):
+    role_dict = settings.roles.model_dump()
+    if new_role.role not in role_dict.values():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"role {new_role.role!r} not exist",
+        )
+
+    return await user.update_role(session, user_to_update, new_role.role)
+
+
 @router.patch("/{user_id}/", response_model=UserSchm)
 async def update_user(
     user_input: UpdateUserSchm,
