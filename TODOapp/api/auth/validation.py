@@ -59,12 +59,21 @@ def get_currant_token_payload(
     return payload
 
 
-def get_auth_user_from_token_of_type(token_type: str):
+def get_auth_user_from_token_of_type(
+    token_type: str,
+    user_role_to_check: str | None = None,
+):
     async def get_auth_user_from_token(
         session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
         payload: Annotated[dict, Depends(get_currant_token_payload)],
     ) -> UserSchmExtended:
         validate_token_type(payload, token_type)
+        if user_role_to_check is not None:
+            if payload.get("role") != user_role_to_check:
+                raise HTTPException(
+                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                    detail="not enough privileges",
+                )
         return await get_user_from_payload(session, payload)
 
     return get_auth_user_from_token
@@ -72,6 +81,11 @@ def get_auth_user_from_token_of_type(token_type: str):
 
 get_currant_auth_user = get_auth_user_from_token_of_type(ACCESS_TOKEN_TYPE)
 get_currant_auth_user_for_refresh = get_auth_user_from_token_of_type(REFRESH_TOKEN_TYPE)
+
+get_currant_auth_user_with_admin = get_auth_user_from_token_of_type(
+    token_type=ACCESS_TOKEN_TYPE,
+    user_role_to_check=settings.roles.admin,
+)
 
 
 async def get_auth_user_from_db(
