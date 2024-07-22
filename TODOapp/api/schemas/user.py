@@ -30,3 +30,4 @@ class UserSchm(BaseUser):
 class UserSchmExtended(UserSchm):
     created_at: datetime
     last_update_at: datetime | None
+    role: str
