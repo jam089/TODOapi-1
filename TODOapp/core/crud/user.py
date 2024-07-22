@@ -56,6 +56,17 @@ async def update_user(
     return user_to_update
 
 
+async def update_role(
+    session: AsyncSession,
+    user_to_update: User,
+    role: str,
+) -> User:
+    user_to_update.role = role
+    await session.commit()
+    await session.refresh(user_to_update)
+    return user_to_update
+
+
 async def delete_user(
     session: AsyncSession,
     user_to_delete: User,
