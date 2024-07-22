@@ -31,3 +31,7 @@ class UserSchmExtended(UserSchm):
     created_at: datetime
     last_update_at: datetime | None
     role: str
+
+
+class UserPassChangeSchm(BaseModel):
+    password: str | bytes
