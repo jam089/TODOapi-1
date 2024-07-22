@@ -44,4 +44,4 @@ class TaskSchm(CreateTaskSchm):
 
 class TaskSchmExtended(TaskSchm):
     created_at: datetime
-    last_update_at: datetime
+    last_update_at: datetime | None = None
