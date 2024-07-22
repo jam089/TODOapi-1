@@ -27,11 +27,16 @@ class TaskStatuses(BaseModel):
     dly: str = "Delayed"  # Delayed
 
 
+class UserRole(BaseModel):
+    user: str = "User"
+    admin: str = "Admin"
+
+
 class AuthJWT(BaseModel):
     private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
     public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
     algorithm: str = "RS256"
-    access_token_expire_minutes: int = 3
+    access_token_expire_minutes: int = 60
     refresh_token_expire_days: int = 40
     prefix: str = "/auth"
     tag: str = "Auth"
@@ -65,6 +70,7 @@ class Settings(BaseSettings):
     run: RunCfg = RunCfg()
     api: APICfg = APICfg()
     tstat: TaskStatuses = TaskStatuses()
+    roles: UserRole = UserRole()
     db: DBCfg
 
 
