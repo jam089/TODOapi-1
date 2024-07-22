@@ -39,3 +39,7 @@ class UserPassChangeSchm(BaseModel):
 
 class UserRoleChangeSchm(BaseModel):
     role: str
+
+
+class CreateAdminUserSchm(UserSchm, CreateUserSchm):
+    pass
