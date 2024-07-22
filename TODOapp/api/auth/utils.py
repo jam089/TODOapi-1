@@ -35,6 +35,7 @@ def create_access_token(user: User) -> str:
         "jti": str(uuid.uuid4()),
         "name": user.name,
         "logged_in_at": datetime.now(UTC).timestamp(),
+        "role": user.role,
     }
     return create_token(
         token_type=ACCESS_TOKEN_TYPE,
