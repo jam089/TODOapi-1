@@ -9,11 +9,21 @@ from api.schemas import (
     UpdateTaskSchm,
     ChangeTaskUserSchm,
     SearchTaskSchm,
+    UserSchmExtended,
 )
 
 
 async def get_all_tasks(session: AsyncSession) -> Sequence[Task]:
     stmt = select(Task).order_by(Task.user_id, Task.id)
+    result: ScalarResult = await session.scalars(stmt)
+    return result.all()
+
+
+async def get_user_all_tasks(
+    session: AsyncSession,
+    user: UserSchmExtended,
+) -> Sequence[Task]:
+    stmt = select(Task).where(Task.user_id == user.id).order_by(Task.user_id, Task.id)
     result: ScalarResult = await session.scalars(stmt)
     return result.all()
 
