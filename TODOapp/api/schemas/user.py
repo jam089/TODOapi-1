@@ -35,3 +35,7 @@ class UserSchmExtended(UserSchm):
 
 class UserPassChangeSchm(BaseModel):
     password: str | bytes
+
+
+class UserRoleChangeSchm(BaseModel):
+    role: str
