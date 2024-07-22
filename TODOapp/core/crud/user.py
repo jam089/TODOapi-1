@@ -56,6 +56,17 @@ async def update_user(
     return user_to_update
 
 
+async def update_password(
+    session: AsyncSession,
+    user_to_update: User,
+    password: str | bytes,
+) -> User:
+    user_to_update.password = hash_password(password).decode()
+    await session.commit()
+    await session.refresh(user_to_update)
+    return user_to_update
+
+
 async def update_role(
     session: AsyncSession,
     user_to_update: User,
