@@ -8,7 +8,6 @@ __all__ = (
     "TaskSchm",
     "SearchTaskSchm",
     "UserSchmExtended",
-    "TaskSchmExtended",
     "TokenInfoSchm",
 )
 
@@ -19,6 +18,5 @@ from .task import (
     UpdateTaskSchm,
     TaskSchm,
     SearchTaskSchm,
-    TaskSchmExtended,
 )
 from .token import TokenInfoSchm
