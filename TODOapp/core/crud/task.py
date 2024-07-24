@@ -54,7 +54,7 @@ async def get_tasks_by_some_statement(
 async def create_task(
     session: AsyncSession,
     task_input: CreateTaskSchm,
-    user: User,
+    user: UserSchmExtended,
 ) -> Task:
     new_task_dict = {
         "user_id": user.id,
