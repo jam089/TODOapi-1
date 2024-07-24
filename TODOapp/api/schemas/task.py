@@ -20,7 +20,7 @@ class UpdateTaskSchm(BaseTask):
     description: str | None = None
     start_at: datetime | None = None
     end_at: datetime | None = None
-    scheduled_hours: int | None
+    scheduled_hours: int | None = None
     status: str | None = None
 
 
