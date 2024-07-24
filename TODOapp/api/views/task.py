@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.auth.validation import get_currant_auth_user_with_admin, get_currant_auth_user
-from api.schemas import TaskSchm, UserSchmExtended
+from api.schemas import TaskSchm, UserSchmExtended, CreateTaskSchm, UpdateTaskSchm
 from api import deps
 from core.models import db_helper
 from core.models.user import User as UserModel
@@ -45,3 +45,16 @@ async def get_user_all_tasks(
     user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
 ):
     return await crud.get_user_all_tasks(session, user)
+
+
+@router.post(
+    "/",
+    response_model=TaskSchm,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_task(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    task_input: CreateTaskSchm,
+    user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
+):
+    return await crud.create_task(session, task_input, user)
