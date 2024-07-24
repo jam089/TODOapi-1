@@ -61,6 +61,16 @@ async def create_task(
     return await crud.create_task(session, task_input, user)
 
 
+no_priv_except = HTTPException(
+    status_code=status.HTTP_406_NOT_ACCEPTABLE,
+    detail="not enough privileges",
+)
+
+task_not_exist_except = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND, detail="task not exist"
+)
+
+
 @router.patch("/{task_id}/", response_model=TaskSchm)
 async def update_task(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
@@ -69,9 +79,23 @@ async def update_task(
     user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
 ):
     task_to_update: Task = await crud.get_task_by_id(session, task_id)
+    if task_to_update is None:
+        raise task_not_exist_except
     if task_to_update.user_id == user.id or user.role == settings.roles.admin:
         return await crud.update_task(session, task_to_update, task_input)
-    raise HTTPException(
-        status_code=status.HTTP_406_NOT_ACCEPTABLE,
-        detail="not enough privileges",
-    )
+    raise no_priv_except
+
+
+@router.delete("/{task_id}/", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_task(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    task_id: int,
+    user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
+) -> None:
+    task_to_delete: Task = await crud.get_task_by_id(session, task_id)
+    if task_to_delete is None:
+        raise task_not_exist_except
+    if task_to_delete.user_id == user.id or user.role == settings.roles.admin:
+        await crud.delete_task(session, task_to_delete)
+        return None
+    raise no_priv_except
