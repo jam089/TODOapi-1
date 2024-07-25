@@ -4,7 +4,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.auth.validation import get_currant_auth_user_with_admin, get_currant_auth_user
-from api.schemas import TaskSchm, UserSchmExtended, CreateTaskSchm, UpdateTaskSchm
+from api.schemas import (
+    TaskSchm,
+    UserSchmExtended,
+    CreateTaskSchm,
+    UpdateTaskSchm,
+    SearchTaskSchm,
+)
 from api import deps
 from core.config import settings
 from core.models import db_helper, Task
@@ -22,7 +28,7 @@ async def get_all_tasks(
     return await crud.get_all_tasks(session)
 
 
-@router.get("/task-id={task_id}", response_model=TaskSchm)
+@router.get("/task-id={task_id}/", response_model=TaskSchm)
 async def get_task_by_task_id(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     task_id: int,
@@ -31,13 +37,30 @@ async def get_task_by_task_id(
     return await crud.get_task_by_id(session, task_id)
 
 
-@router.get("/user-id={user_id}", response_model=Sequence[TaskSchm])
+@router.get("/user-id={user_id}/", response_model=Sequence[TaskSchm])
 async def get_task_by_user_id(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user: Annotated[UserModel, Depends(deps.get_user)],
     admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
 ):
     return await crud.get_user_all_tasks(session, UserSchmExtended.model_validate(user))
+
+
+@router.get("/search/", response_model=Sequence[TaskSchm])
+async def search_task_by_parameters(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    search_task: Annotated[SearchTaskSchm, Depends()],
+    user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
+):
+    if (
+        search_task.status
+        and search_task.status not in settings.tstat.model_dump().values()
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"status {search_task.status!r} not exist",
+        )
+    return await crud.get_tasks_by_some_statement(session, search_task)
 
 
 @router.get("/", response_model=Sequence[TaskSchm])
@@ -97,6 +120,14 @@ async def update_task(
     task_id: int,
     user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
 ):
+    if (
+        task_input.status
+        and task_input.status not in settings.tstat.model_dump().values()
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"status {task_input.status!r} not exist",
+        )
     task_to_update: Task = await crud.get_task_by_id(session, task_id)
     if task_to_update is None:
         raise task_not_exist_except
