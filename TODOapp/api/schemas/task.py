@@ -42,3 +42,4 @@ class TaskSchm(CreateTaskSchm):
     status: str
     created_at: datetime
     last_update_at: datetime | None = None
+    user_id: int
