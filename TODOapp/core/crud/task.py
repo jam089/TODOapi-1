@@ -40,6 +40,10 @@ async def get_tasks_by_some_statement(
         condition.append(Task.id == search_task.id)
     if search_task.name is not None:
         condition.append(Task.name == search_task.name)
+    if search_task.user_id is not None:
+        condition.append(Task.user_id == search_task.user_id)
+    if search_task.status is not None:
+        condition.append(Task.status == search_task.status)
     if search_task.start_at is not None:
         condition.append(Task.start_at >= search_task.id)
     if search_task.end_at is not None:
