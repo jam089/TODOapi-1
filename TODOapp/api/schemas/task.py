@@ -33,6 +33,8 @@ class SearchTaskSchm(BaseTask):
     name: str | None = None
     start_at: datetime | None = None
     end_at: datetime | None = None
+    user_id: int | None = None
+    status: str | None = None
 
 
 class TaskSchm(CreateTaskSchm):
