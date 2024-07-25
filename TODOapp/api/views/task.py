@@ -71,6 +71,25 @@ task_not_exist_except = HTTPException(
 )
 
 
+@router.patch("/{task_id}/change_owner/", response_model=TaskSchm)
+async def change_task_owner(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    task_id: int,
+    user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
+    new_user: Annotated[UserModel, Depends(deps.get_user)],
+):
+    task_to_update: Task = await crud.get_task_by_id(session, task_id)
+    if task_to_update is None:
+        raise task_not_exist_except
+    if task_to_update.user_id == user.id or user.role == settings.roles.admin:
+        return await crud.change_task_user_by_user(
+            session=session,
+            task_to_update=task_to_update,
+            new_user=new_user,
+        )
+    raise no_priv_except
+
+
 @router.patch("/{task_id}/", response_model=TaskSchm)
 async def update_task(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
