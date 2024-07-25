@@ -1,6 +1,6 @@
 from typing import Annotated, Sequence
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.auth.validation import get_currant_auth_user_with_admin, get_currant_auth_user
@@ -12,6 +12,12 @@ from api.schemas import (
     SearchTaskSchm,
 )
 from api import deps
+from api.http_exceptions import (
+    rendering_exception_with_param,
+    no_priv_except,
+    task_not_exist_except,
+    status_exception_templ,
+)
 from core.config import settings
 from core.models import db_helper, Task
 from core.models.user import User as UserModel
@@ -56,9 +62,9 @@ async def search_task_by_parameters(
         search_task.status
         and search_task.status not in settings.tstat.model_dump().values()
     ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"status {search_task.status!r} not exist",
+        raise rendering_exception_with_param(
+            status_exception_templ,
+            search_task.status,
         )
     return await crud.get_tasks_by_some_statement(session, search_task)
 
@@ -82,16 +88,6 @@ async def create_task(
     user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
 ):
     return await crud.create_task(session, task_input, user)
-
-
-no_priv_except = HTTPException(
-    status_code=status.HTTP_406_NOT_ACCEPTABLE,
-    detail="not enough privileges",
-)
-
-task_not_exist_except = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND, detail="task not exist"
-)
 
 
 @router.patch("/{task_id}/change_owner/", response_model=TaskSchm)
@@ -124,9 +120,9 @@ async def update_task(
         task_input.status
         and task_input.status not in settings.tstat.model_dump().values()
     ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"status {task_input.status!r} not exist",
+        raise rendering_exception_with_param(
+            status_exception_templ,
+            task_input.status,
         )
     task_to_update: Task = await crud.get_task_by_id(session, task_id)
     if task_to_update is None:

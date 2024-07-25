@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import HTTPException, status, Depends
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,20 +9,17 @@ from core.config import settings
 from core.models import db_helper, User
 from .utils import TOKEN_TYPE_FIELD, ACCESS_TOKEN_TYPE, REFRESH_TOKEN_TYPE
 from ..schemas import UserSchmExtended
+from ..http_exceptions import (
+    token_invalid_exc,
+    unauth_exc,
+    no_priv_except,
+    inactive_user_exception,
+)
 from core.crud.user import get_user_by_id, get_user_by_username
 from core.utils.jwt import decode_jwt, check_password
 
 tokenUrl = f"{settings.api.prefix}{settings.api.auth_jwt.prefix}/login/"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=tokenUrl)
-
-token_invalid_exc = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid token"
-)
-
-unauth_exc = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="invalid login or password",
-)
 
 
 def validate_token_type(
@@ -41,10 +38,7 @@ async def get_user_from_payload(
     user_id: int | None = payload.get("sub")
     if user := await get_user_by_id(session, user_id):
         if not user.active:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="user is inactive",
-            )
+            raise inactive_user_exception
         return UserSchmExtended.model_validate(user)
     raise token_invalid_exc
 
@@ -70,10 +64,7 @@ def get_auth_user_from_token_of_type(
         validate_token_type(payload, token_type)
         if user_role_to_check is not None:
             if payload.get("role") != user_role_to_check:
-                raise HTTPException(
-                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                    detail="not enough privileges",
-                )
+                raise no_priv_except
         return await get_user_from_payload(session, payload)
 
     return get_auth_user_from_token
@@ -108,9 +99,6 @@ async def get_auth_user_from_db(
         raise unauth_exc
 
     if not user.active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="user is inactive",
-        )
+        raise inactive_user_exception
 
     return user

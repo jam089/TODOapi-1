@@ -1,12 +1,19 @@
 from typing import Sequence, Annotated, Union
 
-from fastapi import APIRouter, Depends, Path, status, HTTPException
+from fastapi import APIRouter, Depends, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.auth.validation import get_currant_auth_user, get_currant_auth_user_with_admin
 from api.schemas import UserSchm, UserSchmExtended, CreateUserSchm, UpdateUserSchm
 from api import deps
 from api.schemas.user import UserPassChangeSchm, UserRoleChangeSchm
+from api.http_exceptions import (
+    rendering_exception_with_param,
+    username_already_exist_exc_templ,
+    role_not_exist_exc_templ,
+    user_id_exc_templ,
+    no_priv_except,
+)
 from core.config import settings
 from core.models import db_helper
 from core.models import User as UserModel
@@ -32,9 +39,9 @@ async def get_user_by_username(
     )
     if user_by_username:
         return user_by_username
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"user {username!r} not found",
+    raise rendering_exception_with_param(
+        username_already_exist_exc_templ,
+        username,
     )
 
 
@@ -55,17 +62,11 @@ async def get_all_user_and_by_id(
 ):
     if id:
         if current_user.role != settings.roles.admin:
-            raise HTTPException(
-                status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                detail="not enough privileges",
-            )
+            raise no_priv_except
         user_by_id: UpdateUserSchm | None = await user.get_user_by_id(session, id)
         if user_by_id:
             return user_by_id
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"user with id=[{int(id)}] not found",
-        )
+        raise rendering_exception_with_param(user_id_exc_templ, str(id))
 
     return await user.get_all_users(session)
 
@@ -81,9 +82,9 @@ async def create_user(
 ):
     if not await user.get_user_by_username(session, user_to_create.username):
         return await user.create_user(session, user_to_create)
-    raise HTTPException(
-        status_code=status.HTTP_409_CONFLICT,
-        detail=f"{user_to_create.username} already exist",
+    raise rendering_exception_with_param(
+        username_already_exist_exc_templ,
+        user_to_create.username,
     )
 
 
@@ -116,9 +117,9 @@ async def change_role(
 ):
     role_dict = settings.roles.model_dump()
     if new_role.role not in role_dict.values():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"role {new_role.role!r} not exist",
+        raise rendering_exception_with_param(
+            role_not_exist_exc_templ,
+            new_role.role,
         )
 
     return await user.update_role(session, user_to_update, new_role.role)
@@ -136,9 +137,9 @@ async def update_user(
 ):
     if not await user.get_user_by_username(session, user_input.username):
         return await user.update_user(session, user_to_update, user_input)
-    raise HTTPException(
-        status_code=status.HTTP_409_CONFLICT,
-        detail=f"{user_input.username} already exist",
+    raise rendering_exception_with_param(
+        username_already_exist_exc_templ,
+        user_input.username,
     )
 
 
@@ -154,9 +155,9 @@ async def update_yourself(
     user_to_update = await user.get_user_by_id(session, current_user.id)
     if not await user.get_user_by_username(session, user_input.username):
         return await user.update_user(session, user_to_update, user_input)
-    raise HTTPException(
-        status_code=status.HTTP_409_CONFLICT,
-        detail=f"{user_input.username} already exist",
+    raise rendering_exception_with_param(
+        username_already_exist_exc_templ,
+        user_input.username,
     )
 
 
