@@ -1,6 +1,13 @@
+[project]
+name = "TODOapp"
+version = "0.1.0"
+description = "TODOapp pet-project"
+authors = [
+    { name="Ivan Filippov", email="jam089@mail.ru" }
+]
+
 [tool.poetry]
 package-mode = false
-
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -17,4 +24,3 @@ pyjwt = {extras = ["crypto"], version = "^2.8.0"}
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.2"
 pytest = "^8.2.2"
-
