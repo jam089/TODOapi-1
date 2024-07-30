@@ -24,3 +24,11 @@ pyjwt = {extras = ["crypto"], version = "^2.8.0"}
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.2"
 pytest = "^8.2.2"
+
+[tool.pytest.ini_options]
+pythonpath = [
+    ".",
+    "TODOapp",
+]
+asyncio_mode = "auto"
+
