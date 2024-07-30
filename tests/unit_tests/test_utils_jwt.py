@@ -1,6 +1,7 @@
 from datetime import datetime, UTC, timedelta
 
 from core.utils.jwt import encode_jwt, decode_jwt
+from core.utils.jwt import hash_password, check_password
 
 
 def test_encode_decode_jwt(jwt_payload_example, jwt_config):
@@ -24,3 +25,9 @@ def test_encode_decode_jwt(jwt_payload_example, jwt_config):
         algorithm=jwt_config.get("algorithm"),
     )
     assert decoded_payload == payload
+
+
+def test_hash_n_check_passwords(passwords):
+    for password in passwords:
+        hash_pass = hash_password(password)
+        assert check_password(password, hash_pass)
