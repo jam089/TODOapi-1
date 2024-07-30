@@ -34,5 +34,8 @@ pythonpath = [
     ".",
     "TODOapp",
 ]
+env_files = [
+    ".env.test",
+]
 asyncio_mode = "auto"
 
