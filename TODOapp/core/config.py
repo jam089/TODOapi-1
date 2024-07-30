@@ -18,6 +18,7 @@ class DBCfg(BaseModel):
     echo_pool: bool = False
     pool_size: int = 50
     max_overflow: int = 10
+    mode: str
 
 
 class TaskStatuses(BaseModel):
