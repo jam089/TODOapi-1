@@ -1,5 +1,7 @@
 from datetime import datetime, UTC, timedelta
 
+import pytest
+
 from core.utils.jwt import encode_jwt, decode_jwt
 from core.utils.jwt import hash_password, check_password
 
@@ -27,7 +29,13 @@ def test_encode_decode_jwt(jwt_payload_example, jwt_config):
     assert decoded_payload == payload
 
 
-def test_hash_n_check_passwords(passwords):
-    for password in passwords:
-        hash_pass = hash_password(password)
-        assert check_password(password, hash_pass)
+@pytest.mark.parametrize(
+    "password",
+    [
+        "fg345gGdg",
+        "!432%#$fG",
+    ],
+)
+def test_hash_n_check_passwords(password):
+    hash_pass = hash_password(password)
+    assert check_password(password, hash_pass)
