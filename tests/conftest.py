@@ -48,13 +48,6 @@ async def prepare_db():
 
 
 @pytest.fixture(scope="session")
-def event_loop(request):
-    loop = asyncio.get_event_loop_policy().get_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(scope="session")
 def jwt_config():
     jwt_config = {
         "private_key": settings.api.auth_jwt.private_key_path.read_text(),
