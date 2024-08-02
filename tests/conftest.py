@@ -48,6 +48,12 @@ async def prepare_db():
 
 
 @pytest.fixture(scope="session")
+async def test_session() -> AsyncGenerator[AsyncSession, None]:
+    async with test_session_factory() as session:
+        yield session
+
+
+@pytest.fixture(scope="session")
 def jwt_config():
     jwt_config = {
         "private_key": settings.api.auth_jwt.private_key_path.read_text(),
