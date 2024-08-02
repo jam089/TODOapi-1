@@ -2,7 +2,7 @@ import asyncio
 from typing import AsyncGenerator
 
 import pytest
-from sqlalchemy import NullPool
+from sqlalchemy import NullPool, text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from core.models import db_helper, Base
@@ -42,6 +42,33 @@ async def prepare_db():
         await conn.run_sync(Base.metadata.drop_all)
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    async with test_session_factory() as conn:
+        await conn.begin()
+        await conn.execute(
+            text(
+                """
+            CREATE OR REPLACE FUNCTION update_last_update_column()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.last_update_at = NOW();
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+            """
+            )
+        )
+        await conn.commit()
+        await conn.execute(
+            text(
+                """
+            CREATE TRIGGER last_update_trigger
+            BEFORE UPDATE ON users
+            FOR EACH ROW
+            EXECUTE FUNCTION update_last_update_column();
+            """
+            )
+        )
+        await conn.commit()
     yield
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
