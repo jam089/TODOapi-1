@@ -162,3 +162,12 @@ async def test_endpoint_delete_yourself(async_client, auth_user):
         headers=auth_user.headers,
     )
     assert response.status_code == 204
+
+
+async def test_admin_endpoint_delete_user(async_client, auth_superuser):
+    admin_id = -1
+    response = await async_client.delete(
+        url=f"{settings.api.user.prefix}/{admin_id}/",
+        headers=auth_superuser.headers,
+    )
+    assert response.status_code == 204
