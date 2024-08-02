@@ -37,9 +37,11 @@ async def test_endpoint_get_profile(async_client: AsyncClient, auth_user):
         headers=auth_user.headers,
     )
     assert response.status_code == 200
-    assert response.json().get("created_at"), "created_at not exist"
-    assert response.json().get("role"), "role not exist"
     assert response.json().get("id"), "'id' field not exist"
+    for test_user in test_users:
+        if test_user.username == auth_user.user.username:
+            test_user.user_id = response.json().get("id")
+            auth_user.user.user_id = response.json().get("id")
     assert response.json().get("created_at"), "'created_at' field not exist"
     assert response.json().get("role"), "'role' field not exist"
 
@@ -57,7 +59,6 @@ async def test_endpoint_get_all_users(async_client: AsyncClient, auth_user):
 
     for json in response.json():  # type: dict
         assert json.get("username") in expected_list
-        assert json.get("active"), "active not exist"
         assert json.get("active"), "'active' field not exist"
 
 
@@ -81,9 +82,7 @@ async def test_endpoint_update_yourself(async_client, auth_user):
 async def test_endpoint_change_your_password(async_client, auth_user):
     response = await async_client.patch(
         url=f"{settings.api.user.prefix}/change_password/",
-        json={
-            "password": auth_user.user.password,
-        },
+        json={"password": auth_user.user.password},
         headers=auth_user.headers,
     )
     assert response.status_code == 200
