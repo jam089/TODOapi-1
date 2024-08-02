@@ -62,6 +62,26 @@ async def test_endpoint_get_all_users(async_client: AsyncClient, auth_user):
         assert json.get("active"), "'active' field not exist"
 
 
+async def test_admin_endpoint_get_user_by_id(
+    async_client, auth_superuser, for_sequenced_user_tests
+):
+    response = await async_client.get(
+        url=f"{settings.api.user.prefix}/",
+        params={
+            "id": for_sequenced_user_tests.user_id,
+        },
+        headers=auth_superuser.headers,
+    )
+    assert response.status_code == 200
+    assert response.json().get("username") == for_sequenced_user_tests.username
+    assert response.json().get("name") == for_sequenced_user_tests.name
+    assert response.json().get("b_date") == for_sequenced_user_tests.b_date
+    assert response.json().get("id") == for_sequenced_user_tests.user_id
+    assert response.json().get("active"), "'active' field not exist"
+    assert response.json().get("created_at"), "'created_at' field not exist"
+    assert response.json().get("role"), "'role' field not exist"
+
+
 async def test_endpoint_update_yourself(async_client, auth_user):
     response = await async_client.patch(
         url=f"{settings.api.user.prefix}/",
