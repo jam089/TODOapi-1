@@ -72,3 +72,19 @@ async def test_endpoint_update_yourself(async_client, auth_user):
     for name, value in auth_user.user.update_testcase.items():
         assert response.json().get(name) == value
     assert response.json().get("last_update_at"), "last_update_at not exist"
+
+
+async def test_endpoint_change_your_password(async_client, auth_user):
+    response = await async_client.patch(
+        url=f"{settings.api.user.prefix}/change_password/",
+        json={
+            "password": auth_user.user.password,
+        },
+        headers=auth_user.headers,
+    )
+    assert response.status_code == 200
+
+    for test_user in test_users:
+        if test_user.username == auth_user.user.username:
+            test_user.update_password()
+            auth_user.user.update_password()
