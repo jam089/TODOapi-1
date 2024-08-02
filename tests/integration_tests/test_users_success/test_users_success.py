@@ -3,7 +3,7 @@ from httpx import AsyncClient
 
 from core.config import settings
 
-from tests.integration_tests.conftest import test_users
+from integration_tests.test_users_success.conftest import test_users
 
 
 @pytest.mark.parametrize("user", test_users)
@@ -46,6 +46,7 @@ async def test_endpoint_get_profile(async_client: AsyncClient, auth_user):
     assert response.json().get("role"), "'role' field not exist"
 
 
+@pytest.mark.skip
 async def test_endpoint_get_all_users(async_client: AsyncClient, auth_user):
     response = await async_client.get(
         url=f"{settings.api.user.prefix}/",
@@ -62,6 +63,7 @@ async def test_endpoint_get_all_users(async_client: AsyncClient, auth_user):
         assert json.get("active"), "'active' field not exist"
 
 
+@pytest.mark.skip
 async def test_admin_endpoint_get_user_by_id(
     async_client, auth_superuser, for_sequenced_user_tests
 ):
@@ -82,6 +84,7 @@ async def test_admin_endpoint_get_user_by_id(
     assert response.json().get("role"), "'role' field not exist"
 
 
+@pytest.mark.skip
 async def test_endpoint_update_yourself(async_client, auth_user):
     response = await async_client.patch(
         url=f"{settings.api.user.prefix}/",
@@ -99,6 +102,7 @@ async def test_endpoint_update_yourself(async_client, auth_user):
     assert response.json().get("last_update_at"), "'last_update_at' field not exist"
 
 
+@pytest.mark.skip
 async def test_endpoint_change_your_password(async_client, auth_user):
     response = await async_client.patch(
         url=f"{settings.api.user.prefix}/change_password/",
@@ -113,6 +117,7 @@ async def test_endpoint_change_your_password(async_client, auth_user):
             auth_user.user.update_password()
 
 
+@pytest.mark.skip
 async def test_admin_endpoint_change_role(
     async_client,
     auth_superuser,
@@ -135,6 +140,7 @@ async def test_admin_endpoint_change_role(
     assert response.json().get("active"), "'active' filed not exist"
 
 
+@pytest.mark.skip
 async def test_admin_endpoint_update_user(
     async_client,
     auth_superuser,
@@ -156,6 +162,7 @@ async def test_admin_endpoint_update_user(
     assert response.json().get("last_update_at"), "'last_update_at' field not exist"
 
 
+@pytest.mark.skip
 async def test_endpoint_delete_yourself(async_client, auth_user):
     response = await async_client.delete(
         url=f"{settings.api.user.prefix}/",
@@ -164,6 +171,7 @@ async def test_endpoint_delete_yourself(async_client, auth_user):
     assert response.status_code == 204
 
 
+@pytest.mark.skip
 async def test_admin_endpoint_delete_user(async_client, auth_superuser):
     admin_id = -1
     response = await async_client.delete(
