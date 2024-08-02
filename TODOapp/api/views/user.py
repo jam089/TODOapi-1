@@ -125,7 +125,7 @@ async def change_role(
     return await user.update_role(session, user_to_update, new_role.role)
 
 
-@router.patch("/{user_id}/", response_model=UserSchm)
+@router.patch("/{user_id}/", response_model=UserSchmExtended)
 async def update_user(
     user_input: UpdateUserSchm,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
