@@ -84,3 +84,21 @@ async def auth_user(async_client: AsyncClient, for_sequenced_user_tests):
         access_token=response.json().get("access_token"),
         refresh_token=response.json().get("refresh_token"),
     )
+
+
+@pytest.fixture(scope="session")
+async def auth_superuser(async_client: AsyncClient):
+    request_json = {
+        "username": "TODOadmin",
+        "password": "admin",
+    }
+    response = await async_client.post(
+        url=f"{settings.api.auth_jwt.prefix}/login/",
+        data=request_json,
+    )
+    s_user = TestUser(*request_json)
+    return AuthedUser(
+        user=s_user,
+        access_token=response.json().get("access_token"),
+        refresh_token=response.json().get("refresh_token"),
+    )
