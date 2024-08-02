@@ -36,9 +36,13 @@ class TestUser:
 
 
 class AuthedUser:
-    def __init__(self, username, password, access_token, refresh_token):
-        self.username = username
-        self.password = password
+    def __init__(
+        self,
+        user: TestUser,
+        access_token,
+        refresh_token,
+    ):
+        self.user = user
         self.access_token = access_token
         self.refresh_token = refresh_token
         self.headers = {"Authorization": f"Bearer {self.access_token}"}
