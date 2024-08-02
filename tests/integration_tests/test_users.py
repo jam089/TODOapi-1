@@ -55,8 +55,20 @@ async def test_endpoint_get_all_users(async_client: AsyncClient, auth_user):
     for json in response.json():  # type: dict
         assert json.get("username") in expected_list
         assert json.get("active"), "active not exist"
+
+
+async def test_endpoint_update_yourself(async_client, auth_user):
+    response = await async_client.patch(
+        url=f"{settings.api.user.prefix}/",
+        json=auth_user.user.update_testcase,
         headers=auth_user.headers,
     )
     assert response.status_code == 200
-    assert response.json().get("created_at"), "created_at not exist"
-    assert response.json().get("role"), "role not exist"
+
+    for test_user in test_users:
+        if test_user.username == auth_user.user.username:
+            test_user.update_user()
+            auth_user.user.update_user()
+    for name, value in auth_user.user.update_testcase.items():
+        assert response.json().get(name) == value
+    assert response.json().get("last_update_at"), "last_update_at not exist"
