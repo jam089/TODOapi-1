@@ -39,6 +39,22 @@ async def test_endpoint_get_profile(async_client: AsyncClient, auth_user):
     assert response.status_code == 200
     assert response.json().get("created_at"), "created_at not exist"
     assert response.json().get("role"), "role not exist"
+
+
+async def test_endpoint_get_all_users(async_client: AsyncClient, auth_user):
+    response = await async_client.get(
+        url=f"{settings.api.user.prefix}/",
+        headers=auth_user.headers,
+    )
+    assert response.status_code == 200
+
+    expected_list = ["TODOadmin"]
+    for user in test_users:
+        expected_list.append(user.username)
+
+    for json in response.json():  # type: dict
+        assert json.get("username") in expected_list
+        assert json.get("active"), "active not exist"
         headers=auth_user.headers,
     )
     assert response.status_code == 200
