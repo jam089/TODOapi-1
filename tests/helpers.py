@@ -3,8 +3,8 @@ class TestUser:
         self,
         username: str,
         password: str,
-        update_testcase: dict,
-        new_password: str,
+        update_testcase: dict | None = None,
+        new_password: str = None,
         name: str | None = None,
         b_date: str | None = None,
     ):
@@ -16,15 +16,21 @@ class TestUser:
         self.b_date = b_date
 
     def update_user(self):
-        if username := self.update_testcase.get("username"):
-            self.username = username
-        if name := self.update_testcase.get("name"):
-            self.name = name
-        if b_date := self.update_testcase.get("b_date"):
-            self.b_date = b_date
+        if self.update_testcase:
+            if username := self.update_testcase.get("username"):
+                self.username = username
+            if name := self.update_testcase.get("name"):
+                self.name = name
+            if b_date := self.update_testcase.get("b_date"):
+                self.b_date = b_date
+            return True
+        return False
 
     def update_password(self):
-        self.password = self._new_password
+        if self._new_password:
+            self.password = self._new_password
+            return True
+        return False
 
     def json(self):
         return {
