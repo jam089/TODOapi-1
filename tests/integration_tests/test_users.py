@@ -135,6 +135,27 @@ async def test_admin_endpoint_change_role(
     assert response.json().get("active"), "'active' filed not exist"
 
 
+async def test_admin_endpoint_update_user(
+    async_client,
+    auth_superuser,
+    for_sequenced_user_tests,
+):
+    response = await async_client.patch(
+        url=f"{settings.api.user.prefix}/{for_sequenced_user_tests.user_id}/",
+        json=for_sequenced_user_tests.update_by_admin_testcase,
+        headers=auth_superuser.headers,
+    )
+    assert response.status_code == 200
+
+    for test_user in test_users:
+        if test_user.username == for_sequenced_user_tests.username:
+            test_user.update_user(admin_flg=True)
+            for_sequenced_user_tests.update_user(admin_flg=True)
+    for name, value in for_sequenced_user_tests.update_by_admin_testcase.items():
+        assert response.json().get(name) == value
+    assert response.json().get("last_update_at"), "'last_update_at' field not exist"
+
+
 async def test_endpoint_delete_yourself(async_client, auth_user):
     response = await async_client.delete(
         url=f"{settings.api.user.prefix}/",
