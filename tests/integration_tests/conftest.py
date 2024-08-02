@@ -22,6 +22,10 @@ test_user_jack = TestUser(
         "b_date": "2000-12-01",
         "active": True,
     },
+    update_by_admin_testcase={
+        "username": "jackson",
+        "name": "Jack N",
+    },
 )
 
 test_user_john = TestUser(
@@ -30,6 +34,10 @@ test_user_john = TestUser(
     new_password="john1234",
     update_testcase={
         "username": "john_doe2",
+    },
+    update_by_admin_testcase={
+        "username": "johnny_d",
+        "name": "Johnny",
     },
 )
 
