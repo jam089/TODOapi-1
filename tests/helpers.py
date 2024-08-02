@@ -14,6 +14,7 @@ class TestUser:
         self._new_password = new_password
         self.name = name
         self.b_date = b_date
+        self.user_id: int | None = None
 
     def update_user(self):
         if self.update_testcase:
