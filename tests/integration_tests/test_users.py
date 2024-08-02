@@ -88,3 +88,11 @@ async def test_endpoint_change_your_password(async_client, auth_user):
         if test_user.username == auth_user.user.username:
             test_user.update_password()
             auth_user.user.update_password()
+
+
+async def test_endpoint_delete_yourself(async_client, auth_user):
+    response = await async_client.delete(
+        url=f"{settings.api.user.prefix}/",
+        headers=auth_user.headers,
+    )
+    assert response.status_code == 204
