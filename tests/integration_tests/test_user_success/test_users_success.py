@@ -53,7 +53,7 @@ async def test_endpoint_get_all_users(async_client: AsyncClient, auth_user):
     )
     assert response.status_code == 200
 
-    expected_list = ["TODOadmin"]
+    expected_list = ["TODOadmin", "falter_user"]
     for user in test_users:
         expected_list.append(user.username)
 
