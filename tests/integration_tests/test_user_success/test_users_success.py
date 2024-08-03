@@ -123,7 +123,6 @@ async def test_admin_endpoint_change_role(
         json={"role": settings.roles.admin},
         headers=auth_superuser.headers,
     )
-    print(response.json())
     assert response.status_code == 200
     assert response.json().get("username") == for_sequenced_user_tests.username
     assert response.json().get("name") == for_sequenced_user_tests.name
