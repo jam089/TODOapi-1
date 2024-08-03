@@ -3,7 +3,7 @@ from string import Template
 from fastapi import HTTPException, status
 
 no_priv_except = HTTPException(
-    status_code=status.HTTP_406_NOT_ACCEPTABLE,
+    status_code=status.HTTP_403_FORBIDDEN,
     detail="not enough privileges",
 )
 
