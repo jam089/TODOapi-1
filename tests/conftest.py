@@ -58,7 +58,7 @@ def pytest_configure(config):
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def prepare_db():
+async def prepare_db(request):
     assert settings.db.mode == "TEST"
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
@@ -92,8 +92,12 @@ async def prepare_db():
         )
         await conn.commit()
     yield
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+    if not (
+        request.config.getoption("--skip-delete-DB")
+        or request.config.getoption("--skip-delete-endpoints")
+    ):
+        async with test_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest.fixture(scope="session")
