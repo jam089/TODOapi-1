@@ -155,6 +155,10 @@ async def test_admin_endpoint_update_user(
     assert response.json().get("last_update_at"), "'last_update_at' field not exist"
 
 
+@pytest.mark.skipif(
+    condition="config.getoption('--skip-delete-endpoints') == True",
+    reason="skipping is turn on",
+)
 async def test_endpoint_delete_yourself(async_client, auth_user):
     response = await async_client.delete(
         url=f"{settings.api.user.prefix}/",
@@ -163,6 +167,10 @@ async def test_endpoint_delete_yourself(async_client, auth_user):
     assert response.status_code == 204
 
 
+@pytest.mark.skipif(
+    condition="config.getoption('--skip-delete-endpoints') == True",
+    reason="skipping is turn on",
+)
 async def test_admin_endpoint_delete_user(async_client, auth_superuser):
     admin_id = -1
     response = await async_client.delete(
