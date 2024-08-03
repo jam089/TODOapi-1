@@ -18,7 +18,6 @@ async def test_endpoint_get_user_by_username(async_client: AsyncClient):
     response = await async_client.get(
         url=f"{settings.api.user.prefix}/invalid_username/",
     )
-    print(response.json())
     assert response.status_code == 404
 
 
