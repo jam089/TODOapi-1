@@ -1,11 +1,8 @@
-from typing import AsyncGenerator
-
 import pytest
-from httpx import AsyncClient, ASGITransport
+from httpx import AsyncClient
 
 from core.config import settings
 from core.utils.on_startup_scripts import check_and_create_superuser
-from main import todo_app
 
 from tests.helpers import AuthedUser, TestUser
 
@@ -42,20 +39,6 @@ test_user_john = TestUser(
 )
 
 test_users = [test_user_jack, test_user_john]
-
-
-@pytest.fixture(scope="session")
-async def async_client() -> AsyncGenerator[AsyncClient, None]:
-    """
-    Creating async test client
-    """
-    async with AsyncClient(
-        transport=ASGITransport(todo_app),
-        base_url=f"http://test{settings.api.prefix}",
-        follow_redirects=False,
-        headers={"Cache-Control": "no-cache"},
-    ) as ac:
-        yield ac
 
 
 @pytest.fixture(scope="session", autouse=True)
