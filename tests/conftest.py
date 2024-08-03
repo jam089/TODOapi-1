@@ -35,6 +35,28 @@ todo_app.dependency_overrides[db_helper.session_getter] = override_session_gette
 todo_app.dependency_overrides[db_helper.dispose] = override_dispose
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--skip-delete-endpoints",
+        action="store_true",
+        default=False,
+        help="skipping delete endpoints to save data in DB",
+    )
+    parser.addoption(
+        "--skip-delete-DB",
+        action="store_true",
+        default=False,
+        help="skipping delete DB part to save data in DB",
+    )
+
+
+def pytest_configure(config):
+    if config.getoption("--skip-delete-endpoints"):
+        return
+    if config.getoption("--skip-delete-DB"):
+        return
+
+
 @pytest.fixture(scope="session", autouse=True)
 async def prepare_db():
     assert settings.db.mode == "TEST"
