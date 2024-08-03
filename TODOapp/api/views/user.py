@@ -13,6 +13,7 @@ from api.http_exceptions import (
     role_not_exist_exc_templ,
     user_id_exc_templ,
     no_priv_except,
+    user_exception_templ,
 )
 from core.config import settings
 from core.models import db_helper
@@ -40,7 +41,7 @@ async def get_user_by_username(
     if user_by_username:
         return user_by_username
     raise rendering_exception_with_param(
-        username_already_exist_exc_templ,
+        user_exception_templ,
         username,
     )
 

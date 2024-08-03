@@ -27,6 +27,11 @@ inactive_user_exception = HTTPException(
     detail="user is inactive",
 )
 
+user_exception_templ = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail="user not exist",
+)
+
 status_exception_templ = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
     detail="status '{parameter}' not exist",
