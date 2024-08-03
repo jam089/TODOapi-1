@@ -10,38 +10,12 @@ from main import todo_app
 from tests.helpers import AuthedUser, TestUser
 
 
-test_user_jack = TestUser(
-    username="jack_n",
-    name="Jack Nicholson",
-    b_date="1937-04-22",
-    password="jack",
-    new_password="jack1234",
-    update_testcase={
-        "username": "jack_nicholson",
-        "name": "Jack Nicholson",
-        "b_date": "2000-12-01",
-        "active": True,
-    },
-    update_by_admin_testcase={
-        "username": "jackson",
-        "name": "Jack N",
-    },
+test_user = TestUser(
+    username="falter_user",
+    name="Falter User",
+    b_date="1000-10-10",
+    password="falter",
 )
-
-test_user_john = TestUser(
-    username="john_doe",
-    password="john_doe",
-    new_password="john1234",
-    update_testcase={
-        "username": "john_doe2",
-    },
-    update_by_admin_testcase={
-        "username": "johnny_d",
-        "name": "Johnny",
-    },
-)
-
-test_users = [test_user_jack, test_user_john]
 
 
 @pytest.fixture(scope="session")
@@ -59,6 +33,14 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
 
 
 @pytest.fixture(scope="session", autouse=True)
+async def create_test_user(async_client):
+    response = await async_client.post(
+        url=f"{settings.api.user.prefix}/",
+        json=test_user.json(),
+    )
+
+
+@pytest.fixture(scope="session", autouse=True)
 async def create_superuser(test_session):
     """
     Creating superuser for admin access rights checking
@@ -66,29 +48,21 @@ async def create_superuser(test_session):
     await check_and_create_superuser(test_session)
 
 
-@pytest.fixture(scope="session", params=test_users)
-def for_sequenced_user_tests(request) -> TestUser:
-    """
-    Fixture which return one test user for sequence of tests
-    """
-    return request.param
-
-
 @pytest.fixture(scope="session")
-async def auth_user(async_client: AsyncClient, for_sequenced_user_tests):
+async def auth_user(async_client: AsyncClient):
     """
     Get loging test users
     """
     request_json = {
-        "username": for_sequenced_user_tests.username,
-        "password": for_sequenced_user_tests.password,
+        "username": test_user.username,
+        "password": test_user.password,
     }
     response = await async_client.post(
         url=f"{settings.api.auth_jwt.prefix}/login/",
         data=request_json,
     )
     return AuthedUser(
-        user=for_sequenced_user_tests,
+        user=test_user,
         access_token=response.json().get("access_token"),
         refresh_token=response.json().get("refresh_token"),
     )
