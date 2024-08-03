@@ -3,7 +3,7 @@ from httpx import AsyncClient
 
 from core.config import settings
 
-from integration_tests.test_users_success.conftest import test_users
+from integration_tests.test_user_success.conftest import test_users
 
 
 @pytest.mark.parametrize("user", test_users)
