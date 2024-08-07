@@ -7,6 +7,13 @@ from core.utils.on_startup_scripts import check_and_create_superuser
 from tests.helpers import AuthedUser, TestUser
 
 
+super_user = {
+    "id": -2,
+    "username": "TODOadmin_for_user_success",
+    "password": "admin",
+}
+
+
 test_user_jack = TestUser(
     username="jack_n",
     name="Jack Nicholson",
@@ -46,7 +53,12 @@ async def create_superuser(test_session):
     """
     Creating superuser for admin access rights checking
     """
-    await check_and_create_superuser(test_session)
+    await check_and_create_superuser(
+        test_session,
+        admin_id=super_user.get("id"),
+        username=super_user.get("username"),
+        password=super_user.get("password"),
+    )
 
 
 @pytest.fixture(scope="session", params=test_users)
@@ -79,10 +91,8 @@ async def auth_user(async_client: AsyncClient, for_sequenced_user_tests):
 
 @pytest.fixture(scope="session")
 async def auth_superuser(async_client: AsyncClient):
-    request_json = {
-        "username": "TODOadmin",
-        "password": "admin",
-    }
+    request_json = super_user
+    request_json.pop("id")
     response = await async_client.post(
         url=f"{settings.api.auth_jwt.prefix}/login/",
         data=request_json,
