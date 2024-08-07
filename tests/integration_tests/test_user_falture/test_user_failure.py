@@ -3,7 +3,7 @@ from httpx import AsyncClient
 
 from core.config import settings
 
-from integration_tests.test_user_falture.conftest import test_user
+from integration_tests.test_user_falture.conftest import test_user, super_user
 
 
 async def test_endpoint_create_user(async_client: AsyncClient):
@@ -152,7 +152,7 @@ async def test_admin_endpoint_delete_user(
         )
         assert response.status_code == 404
     else:
-        admin_id = -1
+        admin_id = super_user.get("id")
         response = await async_client.delete(
             url=f"{settings.api.user.prefix}/{admin_id}/",
             headers=auth_user.headers,
