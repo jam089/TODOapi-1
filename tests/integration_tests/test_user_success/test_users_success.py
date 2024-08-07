@@ -3,7 +3,9 @@ from httpx import AsyncClient
 
 from core.config import settings
 
-from integration_tests.test_user_success.conftest import test_users
+from tests.integration_tests.test_user_success.conftest import test_users
+from tests.integration_tests.test_user_success.conftest import super_user
+from tests.integration_tests.test_user_falture import conftest as failure
 
 
 @pytest.mark.parametrize("user", test_users)
@@ -53,7 +55,12 @@ async def test_endpoint_get_all_users(async_client: AsyncClient, auth_user):
     )
     assert response.status_code == 200
 
-    expected_list = ["TODOadmin", "falter_user"]
+    expected_list = [
+        "TODOadmin",
+        super_user.get("username"),
+        failure.super_user.get("username"),
+        failure.test_user.username,
+    ]
     for user in test_users:
         expected_list.append(user.username)
 
@@ -172,7 +179,7 @@ async def test_endpoint_delete_yourself(async_client, auth_user):
     reason="skipping is turn on",
 )
 async def test_admin_endpoint_delete_user(async_client, auth_superuser):
-    admin_id = -1
+    admin_id = super_user.get("id")
     response = await async_client.delete(
         url=f"{settings.api.user.prefix}/{admin_id}/",
         headers=auth_superuser.headers,
