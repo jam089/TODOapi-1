@@ -1,6 +1,8 @@
 import pytest
 from httpx import AsyncClient
 
+from core.crud.user import create_user, delete_user, get_user_by_id
+from api.schemas.user import CreateUserSchm
 from core.config import settings
 from core.utils.on_startup_scripts import check_and_create_superuser
 
@@ -21,19 +23,37 @@ test_user = TestUser(
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def create_test_user(async_client):
-    response = await async_client.post(
-        url=f"{settings.api.user.prefix}/",
-        json=test_user.json(),
-    )
+async def create_test_user(async_client, test_session, request):
+    """
+    Creating test user for user access rights checking
+    """
+    user_schm = CreateUserSchm(**test_user.json())
+    user = await create_user(test_session, user_schm)
+
+    yield user
+
+    if not request.config.getoption("--skip-delete-endpoints"):
+        await delete_user(test_session, user)
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def create_superuser(test_session):
+async def create_superuser(test_session, request):
     """
     Creating superuser for admin access rights checking
     """
-    await check_and_create_superuser(test_session)
+    await check_and_create_superuser(
+        test_session,
+        admin_id=super_user.get("id"),
+        username=super_user.get("username"),
+        password=super_user.get("password"),
+    )
+
+    s_user = await get_user_by_id(test_session, super_user.get("id"))
+
+    yield s_user
+
+    if not request.config.getoption("--skip-delete-endpoints"):
+        await delete_user(test_session, s_user)
 
 
 @pytest.fixture(scope="session")
