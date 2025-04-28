@@ -34,22 +34,22 @@ user_exception_templ = HTTPException(
 
 status_exception_templ = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
-    detail="Status '{parameter}' not exist",
+    detail="Status '$parameter' not exist",
 )
 
 user_id_exc_templ = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail="User with id=[{parameter}] not found",
+    detail="User with id=[$parameter] not found",
 )
 
 username_already_exist_exc_templ = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
-    detail="Username '{parameter}' already exist",
+    detail="Username '$parameter' already exist",
 )
 
 role_not_exist_exc_templ = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
-    detail="Role {parameter} not exist",
+    detail="Role '$parameter' not exist",
 )
 
 
