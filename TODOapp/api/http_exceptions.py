@@ -4,52 +4,52 @@ from fastapi import HTTPException, status
 
 no_priv_except = HTTPException(
     status_code=status.HTTP_403_FORBIDDEN,
-    detail="not enough privileges",
+    detail="Not enough privileges",
 )
 
 task_not_exist_except = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail="task not exist",
+    detail="Task not exist",
 )
 
 token_invalid_exc = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="invalid token",
+    detail="Invalid token",
 )
 
 unauth_exc = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="invalid login or password",
+    detail="Invalid login or password",
 )
 
 inactive_user_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="user is inactive",
+    detail="User is inactive",
 )
 
 user_exception_templ = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail="user not exist",
+    detail="User not exist",
 )
 
 status_exception_templ = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
-    detail="status '{parameter}' not exist",
+    detail="Status '{parameter}' not exist",
 )
 
 user_id_exc_templ = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail="user with id=[{parameter}] not found",
+    detail="User with id=[{parameter}] not found",
 )
 
 username_already_exist_exc_templ = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
-    detail="username '{parameter}' already exist",
+    detail="Username '{parameter}' already exist",
 )
 
 role_not_exist_exc_templ = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
-    detail="role {parameter} not exist",
+    detail="Role {parameter} not exist",
 )
 
 
