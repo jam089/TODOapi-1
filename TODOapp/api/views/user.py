@@ -26,6 +26,7 @@ router = APIRouter()
 @router.get(
     "/profile/",
     response_model=UserSchmExtended,
+    summary="Get Self Profile",
     description="Authentication is required",
 )
 async def get_profile(
@@ -56,6 +57,7 @@ async def get_user_by_username(
         UserSchmExtended,
         Sequence[UserSchm],
     ],
+    summary="Get All User Or Get User By Id",
     description=f"Authentication is required for request for all users (without query id) or<br>"
     f"Authentication and {settings.roles.admin} role is required for specific user",
 )
@@ -98,6 +100,7 @@ async def create_user(
 @router.patch(
     "/change_password/",
     response_model=UserSchmExtended,
+    summary="Change Self Password",
     description="Authentication is required",
 )
 async def change_your_password(
