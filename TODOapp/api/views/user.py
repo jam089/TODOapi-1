@@ -128,7 +128,7 @@ async def change_role(
     new_role: UserRoleChangeSchm,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user_to_update: Annotated[UserModel, Depends(deps.get_user)],
-    current_user: Annotated[
+    _current_user: Annotated[
         UserSchmExtended,
         Depends(get_currant_auth_user_with_admin),
     ],
@@ -152,7 +152,7 @@ async def update_user(
     user_input: UpdateUserSchm,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user_to_update: Annotated[UserModel, Depends(deps.get_user)],
-    current_user: Annotated[
+    _current_user: Annotated[
         UserSchmExtended,
         Depends(get_currant_auth_user_with_admin),
     ],
@@ -195,7 +195,7 @@ async def update_yourself(
 async def delete_user(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user_to_delete: Annotated[UserModel, Depends(deps.get_user)],
-    current_user: Annotated[
+    _current_user: Annotated[
         UserSchmExtended,
         Depends(get_currant_auth_user_with_admin),
     ],

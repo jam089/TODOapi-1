@@ -33,7 +33,7 @@ router = APIRouter()
 )
 async def get_all_tasks(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
+    _admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
 ):
     return await crud.get_all_tasks(session)
 
@@ -46,7 +46,7 @@ async def get_all_tasks(
 async def get_task_by_task_id(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     task_id: int,
-    admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
+    _admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
 ):
     return await crud.get_task_by_id(session, task_id)
 
@@ -59,7 +59,7 @@ async def get_task_by_task_id(
 async def get_task_by_user_id(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user: Annotated[UserModel, Depends(deps.get_user)],
-    admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
+    _admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
 ):
     return await crud.get_user_all_tasks(session, UserSchmExtended.model_validate(user))
 
@@ -72,7 +72,7 @@ async def get_task_by_user_id(
 async def search_task_by_parameters(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     search_task: Annotated[SearchTaskSchm, Depends()],
-    user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
+    _user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
 ):
     if (
         search_task.status
