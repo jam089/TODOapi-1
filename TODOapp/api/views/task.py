@@ -26,7 +26,11 @@ from core.crud import task as crud
 router = APIRouter()
 
 
-@router.get("/all-tasks/", response_model=Sequence[TaskSchm])
+@router.get(
+    "/all-tasks/",
+    response_model=Sequence[TaskSchm],
+    description="Authentication is required",
+)
 async def get_all_tasks(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
@@ -34,7 +38,11 @@ async def get_all_tasks(
     return await crud.get_all_tasks(session)
 
 
-@router.get("/task-id={task_id}/", response_model=TaskSchm)
+@router.get(
+    "/task-id={task_id}/",
+    response_model=TaskSchm,
+    description=f"Authentication and {settings.roles.admin} role is required",
+)
 async def get_task_by_task_id(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     task_id: int,
@@ -43,7 +51,11 @@ async def get_task_by_task_id(
     return await crud.get_task_by_id(session, task_id)
 
 
-@router.get("/user-id={user_id}/", response_model=Sequence[TaskSchm])
+@router.get(
+    "/user-id={user_id}/",
+    response_model=Sequence[TaskSchm],
+    description=f"Authentication and {settings.roles.admin} role is required",
+)
 async def get_task_by_user_id(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user: Annotated[UserModel, Depends(deps.get_user)],
@@ -52,7 +64,11 @@ async def get_task_by_user_id(
     return await crud.get_user_all_tasks(session, UserSchmExtended.model_validate(user))
 
 
-@router.get("/search/", response_model=Sequence[TaskSchm])
+@router.get(
+    "/search/",
+    response_model=Sequence[TaskSchm],
+    description="Authentication is required",
+)
 async def search_task_by_parameters(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     search_task: Annotated[SearchTaskSchm, Depends()],
@@ -69,7 +85,11 @@ async def search_task_by_parameters(
     return await crud.get_tasks_by_some_statement(session, search_task)
 
 
-@router.get("/", response_model=Sequence[TaskSchm])
+@router.get(
+    "/",
+    response_model=Sequence[TaskSchm],
+    description="Authentication is required",
+)
 async def get_user_all_tasks(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
@@ -81,6 +101,7 @@ async def get_user_all_tasks(
     "/",
     response_model=TaskSchm,
     status_code=status.HTTP_201_CREATED,
+    description="Authentication is required",
 )
 async def create_task(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
@@ -90,7 +111,12 @@ async def create_task(
     return await crud.create_task(session, task_input, user)
 
 
-@router.patch("/{task_id}/change_owner/", response_model=TaskSchm)
+@router.patch(
+    "/{task_id}/change_owner/",
+    response_model=TaskSchm,
+    description=f"Authentication is required for user`s tasks and"
+    f" {settings.roles.admin} role is required for other tasks",
+)
 async def change_task_owner(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     task_id: int,
@@ -109,7 +135,12 @@ async def change_task_owner(
     raise no_priv_except
 
 
-@router.patch("/{task_id}/", response_model=TaskSchm)
+@router.patch(
+    "/{task_id}/",
+    response_model=TaskSchm,
+    description=f"Authentication is required for user`s tasks and"
+    f" {settings.roles.admin} role is required for other tasks",
+)
 async def update_task(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     task_input: UpdateTaskSchm,
@@ -132,7 +163,12 @@ async def update_task(
     raise no_priv_except
 
 
-@router.delete("/{task_id}/", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{task_id}/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    description=f"Authentication is required for user`s tasks and"
+    f" {settings.roles.admin} role is required for other tasks",
+)
 async def delete_task(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     task_id: int,

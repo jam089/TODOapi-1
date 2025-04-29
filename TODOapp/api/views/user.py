@@ -23,7 +23,11 @@ from core.crud import user
 router = APIRouter()
 
 
-@router.get("/profile/", response_model=UserSchmExtended)
+@router.get(
+    "/profile/",
+    response_model=UserSchmExtended,
+    description="Authentication is required",
+)
 async def get_profile(
     current_user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
 ):
@@ -52,6 +56,8 @@ async def get_user_by_username(
         UserSchmExtended,
         Sequence[UserSchm],
     ],
+    description=f"Authentication is required for request for all users (without query id) or<br>"
+    f"Authentication and {settings.roles.admin} role is required for specific user",
 )
 async def get_all_user_and_by_id(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
@@ -89,7 +95,11 @@ async def create_user(
     )
 
 
-@router.patch("/change_password/", response_model=UserSchmExtended)
+@router.patch(
+    "/change_password/",
+    response_model=UserSchmExtended,
+    description="Authentication is required",
+)
 async def change_your_password(
     new_password: UserPassChangeSchm,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
@@ -106,7 +116,11 @@ async def change_your_password(
     )
 
 
-@router.patch("/{user_id}/role/", response_model=UserSchmExtended)
+@router.patch(
+    "/{user_id}/role/",
+    response_model=UserSchmExtended,
+    description=f"Authentication and {settings.roles.admin} role is required",
+)
 async def change_role(
     new_role: UserRoleChangeSchm,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
@@ -126,7 +140,11 @@ async def change_role(
     return await user.update_role(session, user_to_update, new_role.role)
 
 
-@router.patch("/{user_id}/", response_model=UserSchmExtended)
+@router.patch(
+    "/{user_id}/",
+    response_model=UserSchmExtended,
+    description=f"Authentication and {settings.roles.admin} role is required",
+)
 async def update_user(
     user_input: UpdateUserSchm,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
@@ -144,7 +162,11 @@ async def update_user(
     )
 
 
-@router.patch("/", response_model=UserSchmExtended)
+@router.patch(
+    "/",
+    response_model=UserSchmExtended,
+    description="Authentication is required",
+)
 async def update_yourself(
     user_input: UpdateUserSchm,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
@@ -165,6 +187,7 @@ async def update_yourself(
 @router.delete(
     "/{user_id}/",
     status_code=status.HTTP_204_NO_CONTENT,
+    description=f"Authentication and {settings.roles.admin} role is required",
 )
 async def delete_user(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
@@ -180,6 +203,7 @@ async def delete_user(
 @router.delete(
     "/",
     status_code=status.HTTP_204_NO_CONTENT,
+    description="Authentication is required",
 )
 async def delete_yourself(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
