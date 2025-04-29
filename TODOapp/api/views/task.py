@@ -27,7 +27,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/all-tasks/",
+    "/all/",
     response_model=Sequence[TaskSchm],
     description=f"Authentication and {settings.roles.admin} role is required",
 )
