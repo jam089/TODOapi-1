@@ -67,15 +67,15 @@ async def get_all_user_and_by_id(
         UserSchmExtended,
         Depends(get_currant_auth_user),
     ],
-    id: Annotated[int, Path] | None = None,
+    user_id: Annotated[int, Path] | None = None,
 ):
-    if id:
+    if user_id:
         if current_user.role != settings.roles.admin:
             raise no_priv_except
-        user_by_id: UpdateUserSchm | None = await user.get_user_by_id(session, id)
+        user_by_id: UpdateUserSchm | None = await user.get_user_by_id(session, user_id)
         if user_by_id:
             return user_by_id
-        raise rendering_exception_with_param(user_id_exc_templ, str(id))
+        raise rendering_exception_with_param(user_id_exc_templ, str(user_id))
 
     return await user.get_all_users(session)
 
