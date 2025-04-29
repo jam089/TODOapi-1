@@ -39,7 +39,7 @@ async def get_all_tasks(
 
 
 @router.get(
-    "/task-id={task_id}/",
+    "/{task_id}/",
     response_model=TaskSchm,
     description=f"Authentication and {settings.roles.admin} role is required",
 )
