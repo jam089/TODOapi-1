@@ -52,7 +52,7 @@ async def get_task_by_task_id(
 
 
 @router.get(
-    "/user-id={user_id}/",
+    "/by-user/{user_id}/",
     response_model=Sequence[TaskSchm],
     description=f"Authentication and {settings.roles.admin} role is required",
 )
