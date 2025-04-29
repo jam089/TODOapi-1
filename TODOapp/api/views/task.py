@@ -29,7 +29,7 @@ router = APIRouter()
 @router.get(
     "/all-tasks/",
     response_model=Sequence[TaskSchm],
-    description="Authentication is required",
+    description=f"Authentication and {settings.roles.admin} role is required",
 )
 async def get_all_tasks(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
