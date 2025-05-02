@@ -38,6 +38,7 @@ class AuthCookies(BaseModel):
     http_only: bool = True
     secure: bool = False
     samesite: Literal["lax", "strict", "none"] = "lax"
+    path: str = "/"
 
 
 class AuthJWT(BaseModel):

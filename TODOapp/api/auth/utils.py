@@ -39,6 +39,7 @@ def create_token(
         response.set_cookie(
             key=token_type,
             value=token,
+            path=settings.api.auth_jwt.cookies.path,
             httponly=settings.api.auth_jwt.cookies.http_only,
             secure=settings.api.auth_jwt.cookies.secure,
             samesite=settings.api.auth_jwt.cookies.samesite,

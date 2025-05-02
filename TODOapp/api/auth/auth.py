@@ -6,10 +6,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.schemas import TokenInfoSchm, UserSchmExtended
 from api.auth.utils import create_access_token, create_refresh_token
+from core.config import settings
 from core.models import db_helper, User
 from .validation import (
     get_auth_user_from_db,
     get_currant_auth_user_for_refresh,
+    get_currant_auth_user,
+    ACCESS_TOKEN_TYPE,
+    REFRESH_TOKEN_TYPE,
 )
 
 router = APIRouter()
@@ -48,3 +52,25 @@ async def auth_user(
     return TokenInfoSchm(
         access_token=access_token,
     )
+
+
+@router.post("/logout/")
+async def auth_user(
+    _current_user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
+    response: Response,
+):
+    response.delete_cookie(
+        key=ACCESS_TOKEN_TYPE,
+        httponly=settings.api.auth_jwt.cookies.http_only,
+        path=settings.api.auth_jwt.cookies.path,
+        secure=settings.api.auth_jwt.cookies.secure,
+        samesite=settings.api.auth_jwt.cookies.samesite,
+    )
+    response.delete_cookie(
+        REFRESH_TOKEN_TYPE,
+        httponly=settings.api.auth_jwt.cookies.http_only,
+        path=settings.api.auth_jwt.cookies.path,
+        secure=settings.api.auth_jwt.cookies.secure,
+        samesite=settings.api.auth_jwt.cookies.samesite,
+    )
+    return {"detail": "Logout successful"}
