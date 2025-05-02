@@ -2,16 +2,21 @@ from datetime import timedelta, datetime, UTC
 import uuid
 
 from fastapi import Request, Response, Depends
+from fastapi.security import OAuth2PasswordBearer
 
 from core.config import settings
 from core.utils.jwt import encode_jwt
 from core.models import User
 
 TOKEN_TYPE_FIELD = "type"
-ACCESS_TOKEN_TYPE = "access"
-REFRESH_TOKEN_TYPE = "refresh"
 ACCESS_TOKEN_TYPE = "access_token"
 REFRESH_TOKEN_TYPE = "refresh_token"
+
+TOKEN_URL = f"{settings.api.prefix}{settings.api.auth_jwt.prefix}/login/"
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl=TOKEN_URL,
+    auto_error=False,
+)
 
 
 def create_token(
@@ -71,3 +76,15 @@ def create_refresh_token(user: User, response: Response | None = None):
         ),
         response=response,
     )
+
+
+def get_token_of_type(token_type: str):
+    def get_token(
+        request: Request,
+        token: str | None = Depends(oauth2_scheme),
+    ):
+        if not token:
+            token = request.cookies.get(token_type)
+        return token
+
+    return get_token

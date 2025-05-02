@@ -1,13 +1,17 @@
 from typing import Annotated
 
 from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import settings
 from core.models import db_helper, User
-from .utils import TOKEN_TYPE_FIELD, ACCESS_TOKEN_TYPE, REFRESH_TOKEN_TYPE
+from .utils import (
+    TOKEN_TYPE_FIELD,
+    ACCESS_TOKEN_TYPE,
+    REFRESH_TOKEN_TYPE,
+    get_token_of_type,
+)
 from ..schemas import UserSchmExtended
 from ..http_exceptions import (
     token_invalid_exc,
@@ -17,9 +21,6 @@ from ..http_exceptions import (
 )
 from core.crud.user import get_user_by_id, get_user_by_username
 from core.utils.jwt import decode_jwt, check_password
-
-tokenUrl = f"{settings.api.prefix}{settings.api.auth_jwt.prefix}/login/"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=tokenUrl)
 
 
 def validate_token_type(
@@ -43,14 +44,19 @@ async def get_user_from_payload(
     raise token_invalid_exc
 
 
-def get_currant_token_payload(
-    token: Annotated[str, Depends(oauth2_scheme)],
-) -> dict:
-    try:
-        payload = decode_jwt(token)
-    except InvalidTokenError:
-        raise token_invalid_exc
-    return payload
+def get_currant_token_payload_of_token_type(
+    token_type: str,
+):
+    def get_currant_token_payload(
+        token: Annotated[str, Depends(get_token_of_type(token_type=token_type))],
+    ) -> dict:
+        try:
+            payload = decode_jwt(token)
+        except InvalidTokenError:
+            raise token_invalid_exc
+        return payload
+
+    return get_currant_token_payload
 
 
 def get_auth_user_from_token_of_type(
@@ -59,7 +65,10 @@ def get_auth_user_from_token_of_type(
 ):
     async def get_auth_user_from_token(
         session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-        payload: Annotated[dict, Depends(get_currant_token_payload)],
+        payload: Annotated[
+            dict,
+            Depends(get_currant_token_payload_of_token_type(token_type=token_type)),
+        ],
     ) -> UserSchmExtended:
         validate_token_type(payload, token_type)
         if user_role_to_check is not None:
