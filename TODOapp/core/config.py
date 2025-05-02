@@ -1,3 +1,4 @@
+from typing import Literal
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -33,6 +34,12 @@ class UserRole(BaseModel):
     admin: str = "Admin"
 
 
+class AuthCookies(BaseModel):
+    http_only: bool = True
+    secure: bool = False
+    samesite: Literal["lax", "strict", "none"] = "lax"
+
+
 class AuthJWT(BaseModel):
     private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
     public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
@@ -41,6 +48,7 @@ class AuthJWT(BaseModel):
     refresh_token_expire_days: int = 40
     prefix: str = "/auth"
     tag: str = "Auth"
+    cookies: AuthCookies = AuthCookies()
 
 
 class UserAPI(BaseModel):
