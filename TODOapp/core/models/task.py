@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 from datetime import datetime
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, DateTime
 
 from core.models import Base
 from core.config import settings
@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 class Task(Base):
     name: Mapped[str] = mapped_column(String(70))
     description: Mapped[str | None] = mapped_column(String(360))
-    start_at: Mapped[datetime | None]
-    end_at: Mapped[datetime | None]
+    start_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    end_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     scheduled_hours: Mapped[int] = mapped_column(default=0, server_default="0")
     status: Mapped[str] = mapped_column(
         default=settings.tstat.pld,
