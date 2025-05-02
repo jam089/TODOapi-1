@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,6 +18,7 @@ router = APIRouter()
 async def auth_user(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    response: Response,
 ):
 
     user = await get_auth_user_from_db(
@@ -25,8 +26,8 @@ async def auth_user(
         form_data.username,
         form_data.password,
     )
-    access_token = create_access_token(user)
-    refresh_token = create_refresh_token(user)
+    access_token = create_access_token(user, response=response)
+    refresh_token = create_refresh_token(user, response=response)
     return TokenInfoSchm(
         access_token=access_token,
         refresh_token=refresh_token,
