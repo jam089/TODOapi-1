@@ -39,32 +39,6 @@ async def get_all_tasks(
 
 
 @router.get(
-    "/{task_id}/",
-    response_model=TaskSchm,
-    description=f"Authentication and {settings.roles.admin} role is required",
-)
-async def get_task_by_task_id(
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    task_id: int,
-    _admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
-):
-    return await crud.get_task_by_id(session, task_id)
-
-
-@router.get(
-    "/by-user/{user_id}/",
-    response_model=Sequence[TaskSchm],
-    description=f"Authentication and {settings.roles.admin} role is required",
-)
-async def get_task_by_user_id(
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    user: Annotated[UserModel, Depends(deps.get_user)],
-    _admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
-):
-    return await crud.get_user_all_tasks(session, UserSchmExtended.model_validate(user))
-
-
-@router.get(
     "/search/",
     response_model=Sequence[TaskSchm],
     description="Authentication is required",
@@ -86,6 +60,19 @@ async def search_task_by_parameters(
 
 
 @router.get(
+    "/by-user/{user_id}/",
+    response_model=Sequence[TaskSchm],
+    description=f"Authentication and {settings.roles.admin} role is required",
+)
+async def get_task_by_user_id(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    user: Annotated[UserModel, Depends(deps.get_user)],
+    _admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
+):
+    return await crud.get_user_all_tasks(session, UserSchmExtended.model_validate(user))
+
+
+@router.get(
     "/",
     response_model=Sequence[TaskSchm],
     description="Authentication is required",
@@ -95,6 +82,19 @@ async def get_user_all_tasks(
     user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
 ):
     return await crud.get_user_all_tasks(session, user)
+
+
+@router.get(
+    "/{task_id}/",
+    response_model=TaskSchm,
+    description=f"Authentication and {settings.roles.admin} role is required",
+)
+async def get_task_by_task_id(
+    # session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    task: Annotated[Task, Depends(deps.get_task)],
+    _admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
+):
+    return task
 
 
 @router.post(

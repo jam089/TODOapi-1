@@ -42,6 +42,12 @@ user_id_exc_templ = HTTPException(
     detail="User with id=[$parameter] not found",
 )
 
+
+task_id_exc_templ = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail="Task with id=[$parameter] not found",
+)
+
 username_already_exist_exc_templ = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
     detail="Username '$parameter' already exist",
