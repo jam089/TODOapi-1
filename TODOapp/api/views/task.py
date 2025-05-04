@@ -15,7 +15,7 @@ from api import deps
 from api.http_exceptions import (
     rendering_exception_with_param,
     no_priv_except,
-    task_not_exist_except,
+    task_id_exc_templ,
     status_exception_templ,
 )
 from core.config import settings
@@ -125,7 +125,7 @@ async def change_task_owner(
 ):
     task_to_update: Task = await crud.get_task_by_id(session, task_id)
     if task_to_update is None:
-        raise task_not_exist_except
+        raise rendering_exception_with_param(task_id_exc_templ, str(task_id))
     if task_to_update.user_id == user.id or user.role == settings.roles.admin:
         return await crud.change_task_user_by_user(
             session=session,
@@ -158,7 +158,7 @@ async def update_task(
         )
     task_to_update: Task = await crud.get_task_by_id(session, task_id)
     if task_to_update is None:
-        raise task_not_exist_except
+        raise rendering_exception_with_param(task_id_exc_templ, str(task_id))
     if task_to_update.user_id == user.id or user.role == settings.roles.admin:
         return await crud.update_task(session, task_to_update, task_input)
     raise no_priv_except
@@ -177,7 +177,7 @@ async def delete_task(
 ) -> None:
     task_to_delete: Task = await crud.get_task_by_id(session, task_id)
     if task_to_delete is None:
-        raise task_not_exist_except
+        raise rendering_exception_with_param(task_id_exc_templ, str(task_id))
     if task_to_delete.user_id == user.id or user.role == settings.roles.admin:
         await crud.delete_task(session, task_to_delete)
         return None

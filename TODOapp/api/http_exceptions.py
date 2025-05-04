@@ -7,11 +7,6 @@ no_priv_except = HTTPException(
     detail="Not enough privileges",
 )
 
-task_not_exist_except = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND,
-    detail="Task not exist",
-)
-
 token_invalid_exc = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Invalid token",
