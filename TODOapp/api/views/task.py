@@ -139,7 +139,8 @@ async def change_task_owner(
     "/{task_id}/",
     response_model=TaskSchm,
     description=f"Authentication is required for user`s tasks and"
-    f" {settings.roles.admin} role is required for other tasks",
+    f" {settings.roles.admin} role is required for other tasks"
+    f"<br>Use for status: {", ".join(settings.tstat.model_dump().values())}",
 )
 async def update_task(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],

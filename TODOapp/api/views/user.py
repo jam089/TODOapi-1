@@ -122,7 +122,8 @@ async def change_your_password(
 @router.patch(
     "/{user_id}/role/",
     response_model=UserSchmExtended,
-    description=f"Authentication and {settings.roles.admin} role is required",
+    description=f"Authentication and {settings.roles.admin} role is required"
+    f"<br>Use for role: {", ".join(settings.roles.model_dump().values())}",
 )
 async def change_role(
     new_role: UserRoleChangeSchm,
