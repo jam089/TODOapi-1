@@ -1,5 +1,6 @@
 __all__ = (
     "CreateUserSchm",
+    "CreateAdminUserSchm",
     "UpdateUserSchm",
     "UserSchm",
     "CreateTaskSchm",
@@ -11,7 +12,13 @@ __all__ = (
     "TokenInfoSchm",
 )
 
-from .user import CreateUserSchm, UpdateUserSchm, UserSchm, UserSchmExtended
+from .user import (
+    CreateUserSchm,
+    UpdateUserSchm,
+    UserSchm,
+    UserSchmExtended,
+    CreateAdminUserSchm,
+)
 from .task import (
     CreateTaskSchm,
     ChangeTaskUserSchm,

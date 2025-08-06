@@ -3,10 +3,9 @@ from typing import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, Result, ScalarResult
 
-from api.schemas.user import CreateAdminUserSchm
 from core.models import User
 from core.utils.jwt import hash_password
-from api.schemas import CreateUserSchm, UpdateUserSchm
+from api.schemas import CreateUserSchm, UpdateUserSchm, CreateAdminUserSchm
 
 
 async def get_all_users(session: AsyncSession) -> Sequence[User]:
@@ -29,34 +28,33 @@ async def get_user_by_username(
     return user
 
 
-async def create_user(
+async def _create_user_helper(
     session: AsyncSession,
-    user_input: CreateUserSchm,
+    user_input: dict,
 ) -> User:
-    user_input_w_hashed_pw = user_input.model_dump()
-    user_input_w_hashed_pw.update(
-        password=hash_password(user_input.password).decode(),
+    user_input_w_hashed_password = user_input.copy()
+    user_input_w_hashed_password.update(
+        password=hash_password(user_input["password"]).decode(),
     )
-    new_user = User(**user_input_w_hashed_pw)
+    new_user = User(**user_input_w_hashed_password)
     session.add(new_user)
     await session.commit()
     await session.refresh(new_user)
     return new_user
+
+
+async def create_user(
+    session: AsyncSession,
+    user_input: CreateUserSchm,
+) -> User:
+    return await _create_user_helper(session, user_input.model_dump())
 
 
 async def create_admin_user(
     session: AsyncSession,
     user_input: CreateAdminUserSchm,
 ) -> User:
-    user_input_w_hashed_pw = user_input.model_dump()
-    user_input_w_hashed_pw.update(
-        password=hash_password(user_input.password).decode(),
-    )
-    new_user = User(**user_input_w_hashed_pw)
-    session.add(new_user)
-    await session.commit()
-    await session.refresh(new_user)
-    return new_user
+    return await _create_user_helper(session, user_input.model_dump())
 
 
 async def update_user(
