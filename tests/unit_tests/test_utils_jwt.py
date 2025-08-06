@@ -38,4 +38,5 @@ def test_encode_decode_jwt(jwt_payload_example, jwt_config):
 )
 def test_hash_n_check_passwords(password):
     hash_pass = hash_password(password)
+    assert hash_pass != password
     assert check_password(password, hash_pass)
