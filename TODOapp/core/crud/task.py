@@ -45,7 +45,7 @@ async def get_tasks_by_some_statement(
     if search_task.status is not None:
         condition.append(Task.status == search_task.status)
     if search_task.start_at is not None:
-        condition.append(Task.start_at >= search_task.id)
+        condition.append(Task.start_at >= search_task.start_at)
     if search_task.end_at is not None:
         condition.append(Task.end_at <= search_task.end_at)
 
