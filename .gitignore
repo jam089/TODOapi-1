@@ -4,3 +4,4 @@
 */certs
 .python-version
 /htmlcov
+.coverage
