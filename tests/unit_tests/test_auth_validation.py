@@ -58,7 +58,6 @@ async def test_get_user_from_payload_inactive_user(mocker, user_mock):
     )
     session_mock = mocker.AsyncMock()
     payload = {"sub": user_mock(1).id}
-    print(payload)
     with pytest.raises(HTTPException) as exc_info:
         await get_user_from_payload(session_mock, payload)
     assert exc_info.value.status_code == 401
