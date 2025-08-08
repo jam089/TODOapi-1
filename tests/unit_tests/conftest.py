@@ -1,4 +1,7 @@
+from typing import Any
+
 import pytest
+from datetime import datetime
 
 from core.models import User, Task
 
@@ -21,17 +24,40 @@ def jwt_payload_example():
 @pytest.fixture(scope="package")
 def user_mock():
     user_list = [
-        User(id=0, name="Test User 1"),
-        User(id=1, name="Test User 2"),
+        User(
+            id=0,
+            username="test_user_0",
+            name="Test User 0",
+            role="User",
+            active=True,
+            created_at=datetime.now(),
+            password="test0",
+        ),
+        User(
+            id=1,
+            username="test_user_1",
+            name="Test User 1",
+            role="User",
+            active=False,
+            created_at=datetime.now(),
+            password="test1",
+        ),
     ]
 
-    def _create_user(user_id):
-        try:
-            return user_list[user_id]
-        except IndexError:
-            return None
+    def _get_user(identifier: Any) -> User | None:
+        if isinstance(identifier, int):
+            try:
+                return user_list[identifier]
+            except IndexError:
+                return None
+        elif isinstance(identifier, str):
+            return next(
+                (user for user in user_list if user.username == identifier), None
+            )
+        else:
+            raise ValueError("Identifier must be an int or str")
 
-    return _create_user
+    return _get_user
 
 
 @pytest.fixture(scope="package")
