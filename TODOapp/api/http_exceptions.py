@@ -24,7 +24,7 @@ inactive_user_exception = HTTPException(
 
 user_exception_templ = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail="User not exist",
+    detail="User $parameter not exist",
 )
 
 status_exception_templ = HTTPException(
