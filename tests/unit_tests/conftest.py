@@ -73,8 +73,10 @@ def user_mock():
 @pytest.fixture(scope="package")
 def task_mock():
     task_list = [
-        Task(id=0, name="Test Task 1"),
-        Task(id=1, name="Test Task 2"),
+        Task(id=0, name="Test Task 0", status=settings.tstat.pld),
+        Task(id=1, name="Test Task 1"),
+        Task(id=2, name="Test Task 2", status=settings.tstat.atw),
+        Task(id=3, name="Test Task 3", status="Very_needed"),
     ]
 
     def _create_task(task_id):
