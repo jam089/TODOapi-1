@@ -4,6 +4,7 @@ import pytest
 from datetime import datetime
 
 from core.models import User, Task
+from core.config import settings
 
 
 @pytest.fixture(scope="package")
@@ -28,7 +29,7 @@ def user_mock():
             id=0,
             username="test_user_0",
             name="Test User 0",
-            role="User",
+            role=settings.roles.user,
             active=True,
             created_at=datetime.now(),
             password="test0",
@@ -37,10 +38,19 @@ def user_mock():
             id=1,
             username="test_user_1",
             name="Test User 1",
-            role="User",
+            role=settings.roles.user,
             active=False,
             created_at=datetime.now(),
             password="test1",
+        ),
+        User(
+            id=2,
+            username="test_admin_2",
+            name="Test Admin 2",
+            role=settings.roles.admin,
+            active=True,
+            created_at=datetime.now(),
+            password="test2",
         ),
     ]
 
