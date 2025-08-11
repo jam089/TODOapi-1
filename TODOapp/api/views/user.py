@@ -69,7 +69,7 @@ async def get_all_user_and_by_id(
     ],
     user_id: Annotated[int, Path] | None = None,
 ):
-    if user_id:
+    if user_id is not None:
         if current_user.role != settings.roles.admin:
             raise no_priv_except
         user_by_id: UpdateUserSchm | None = await user.get_user_by_id(session, user_id)
