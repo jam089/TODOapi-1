@@ -52,7 +52,7 @@ async def test_get_task_success(mocker, task_id, task_mock):
 
 @pytest.mark.asyncio
 async def test_get_task_not_found(mocker, task_mock):
-    task_id = 3
+    task_id = 10
     session_mock = mocker.AsyncMock()
     mocker.patch(
         "api.deps.task_crud.get_task_by_id",
@@ -61,4 +61,4 @@ async def test_get_task_not_found(mocker, task_mock):
     with pytest.raises(HTTPException) as exc:
         await get_task(session_mock, task_id)
     assert exc.value.status_code == 404
-    assert exc.value.detail == "Task with id=[3] not found"
+    assert exc.value.detail == f"Task with id=[{task_id}] not found"
