@@ -4,6 +4,7 @@ from core.config import settings
 from core.models import User
 
 
+# TODO delete
 class TestUser:
     def __init__(
         self,

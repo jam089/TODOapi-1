@@ -1,121 +1,129 @@
-from typing import AsyncGenerator
-
+from factory.faker import faker
 import pytest
-from sqlalchemy import NullPool, text
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from httpx import AsyncClient, ASGITransport
-
-from core.models import db_helper, Base
 
 from core.config import settings
-from main import todo_app
-
-
-test_engine = create_async_engine(
-    url=str(settings.db.url),
-    poolclass=NullPool,
+from core.utils.jwt import hash_password
+from tests.integration_tests.database import (
+    override_dispose,
+    override_session_getter,
+    pytest_addoption,
+    pytest_configure,
+    prepare_db,
+    test_session,
+    async_client,
+    auth_client,
 )
-test_session_factory = async_sessionmaker(
-    bind=test_engine,
-    autoflush=False,
-    autocommit=False,
-    expire_on_commit=False,
-)
+from tests.integration_tests.factories import UserFactory
+from tests.helpers import authentication
 
 
-async def override_dispose() -> None:
-    await test_engine.dispose()
+create_users = {
+    "user_1": {
+        "username": faker.Faker().user_name(),
+        "password": faker.Faker().password(),
+        "name": faker.Faker().name(),
+        "b_date": faker.Faker().date_of_birth().strftime("%Y-%m-%d"),
+    },
+    "user_2": {
+        "username": faker.Faker().user_name(),
+        "password": faker.Faker().password(),
+    },
+}
+
+update_scenarios = {
+    "test_user_a": {
+        "admin": {
+            "username": "jackson",
+            "name": "Jack N",
+        },
+        "user": {
+            "username": "jack_nicholson",
+            "name": "Jack Nicholson",
+            "b_date": "2000-12-01",
+            "active": True,
+        },
+    },
+    "test_user_b": {
+        "admin": {
+            "username": "john_doe2",
+        },
+        "user": {
+            "username": "johnny_d",
+            "name": "Johnny",
+        },
+    },
+}
 
 
-async def override_session_getter() -> AsyncGenerator[AsyncSession, None]:
-    async with test_session_factory() as session:
-        yield session
-
-
-todo_app.dependency_overrides[db_helper.session_getter] = override_session_getter
-todo_app.dependency_overrides[db_helper.dispose] = override_dispose
-
-
-def pytest_addoption(parser):
-    parser.addoption(
-        "--skip-delete-endpoints",
-        action="store_true",
-        default=False,
-        help="skipping delete endpoints to save data in DB",
+@pytest.fixture
+async def test_user_a(test_session, auth_client):
+    password = faker.Faker().password()
+    user = UserFactory.build(
+        password=hash_password(password).decode(),
     )
-    parser.addoption(
-        "--skip-delete-DB",
-        action="store_true",
-        default=False,
-        help="skipping delete DB part to save data in DB",
+    test_session.add(user)
+    await test_session.commit()
+    await test_session.refresh(user)
+    auth_response = await authentication(auth_client, user, password)
+    return {
+        "user": user,
+        "password": password,
+        "update_scenarios": update_scenarios.get("test_user_a"),
+        **auth_response,
+    }
+
+
+@pytest.fixture
+async def test_user_b(test_session, auth_client):
+    password = faker.Faker().password()
+    user = UserFactory.build(
+        name=None,
+        b_date=None,
+        password=hash_password(password).decode(),
     )
+    test_session.add(user)
+    await test_session.commit()
+    await test_session.refresh(user)
+    auth_response = await authentication(auth_client, user, password)
+    return {
+        "user": user,
+        "password": password,
+        "update_scenarios": update_scenarios.get("test_user_b"),
+        **auth_response,
+    }
 
 
-def pytest_configure(config):
-    if config.getoption("--skip-delete-endpoints"):
-        return
-    if config.getoption("--skip-delete-DB"):
-        return
+@pytest.fixture
+async def admin_user(test_session, auth_client):
+    password = faker.Faker().password()
+    user = UserFactory.build(
+        name=None,
+        b_date=None,
+        role=settings.roles.admin,
+        password=hash_password(password).decode(),
+    )
+    test_session.add(user)
+    await test_session.commit()
+    await test_session.refresh(user)
+    auth_response = await authentication(auth_client, user, password)
+    return {
+        "user": user,
+        "password": password,
+        **auth_response,
+    }
 
 
-@pytest.fixture(scope="session", autouse=True)
-async def prepare_db(request):
-    assert settings.db.mode == "TEST"
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    async with test_session_factory() as conn:
-        await conn.begin()
-        await conn.execute(
-            text(
-                """
-            CREATE OR REPLACE FUNCTION update_last_update_column()
-            RETURNS TRIGGER AS $$
-            BEGIN
-                NEW.last_update_at = NOW();
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
-            """
-            )
-        )
-        await conn.commit()
-        await conn.execute(
-            text(
-                """
-            CREATE TRIGGER last_update_trigger
-            BEFORE UPDATE ON users
-            FOR EACH ROW
-            EXECUTE FUNCTION update_last_update_column();
-            """
-            )
-        )
-        await conn.commit()
-    yield
-    if not (
-        request.config.getoption("--skip-delete-DB")
-        or request.config.getoption("--skip-delete-endpoints")
-    ):
-        async with test_engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
+@pytest.fixture(params=["test_user_a", "test_user_b"])
+async def test_user(request, test_user_a, test_user_b):
+    match request.param:
+        case "test_user_a":
+            return test_user_a
+        case "test_user_b":
+            return test_user_b
+        case _:
+            return None
 
 
-@pytest.fixture(scope="session")
-async def test_session() -> AsyncGenerator[AsyncSession, None]:
-    async with test_session_factory() as session:
-        yield session
-
-
-@pytest.fixture(scope="session")
-async def async_client() -> AsyncGenerator[AsyncClient, None]:
-    """
-    Creating async test client
-    """
-    async with AsyncClient(
-        transport=ASGITransport(todo_app),
-        base_url=f"http://test{settings.api.prefix}",
-        follow_redirects=False,
-        headers={"Cache-Control": "no-cache"},
-    ) as ac:
-        yield ac
+@pytest.fixture(params=["user_1", "user_2"])
+async def test_user_to_create(request):
+    return create_users.get(request.param)
