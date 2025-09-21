@@ -1,3 +1,9 @@
+from httpx import AsyncClient
+
+from core.config import settings
+from core.models import User
+
+
 class TestUser:
     def __init__(
         self,
@@ -63,3 +69,21 @@ class AuthedUser:
         self.access_token = access_token
         self.refresh_token = refresh_token
         self.headers = {"Authorization": f"Bearer {self.access_token}"}
+
+
+async def authentication(async_client: AsyncClient, user: User, password: str):
+    request_json = {
+        "username": user.username,
+        "password": password,
+    }
+    response = await async_client.post(
+        url=f"{settings.api.auth_jwt.prefix}/login/",
+        data=request_json,
+    )
+    access_token = response.json().get("access_token")
+    refresh_token = response.json().get("refresh_token")
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "headers": {"Authorization": f"Bearer {access_token}"},
+    }
