@@ -1,92 +1,77 @@
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.crud.user import create_user, delete_user, get_user_by_id
-from api.schemas.user import CreateUserSchm
-from core.config import settings
-from core.utils.on_startup_scripts import check_and_create_superuser
+from core.models import User
 
-from tests.helpers import AuthedUser, TestUser
-
-super_user = {
-    "id": -1,
-    "username": "TODOadmin_for_user_failure",
-    "password": "admin",
-}
-
-test_user = TestUser(
-    username="falter_user_for_user_endpoint",
-    name="Falter User",
-    b_date="1000-10-10",
-    password="falter",
-)
+from tests.helpers import authentication
 
 
-@pytest.fixture(scope="session", autouse=True)
-async def create_test_user(async_client, test_session, request):
+async def mutated(
+    request,
+    test_session: AsyncSession,
+    async_client: AsyncClient,
+    user: dict,
+):
     """
-    Creating test user for user access rights checking
+    Examples:
+    {"target": "access_token", "value": "wrong_token"}
+    {"target": "user", "attrs": {"active": False}}
     """
-    user_schm = CreateUserSchm(**test_user.json())
-    user = await create_user(test_session, user_schm)
+    wrong_param = request.param or {}
+    target = wrong_param.get("target")
 
-    yield user
+    if target == "user":
+        user_obj: User = user.get("user")
+        attrs: dict = wrong_param.get("attrs")
+        for attr, value in attrs.items():
+            setattr(user_obj, attr, value)
+        await test_session.commit()
+        await test_session.refresh(user_obj)
+        if "role" in attrs.keys():
+            new_auth_info = await authentication(
+                async_client, user_obj, user.get("password")
+            )
+            user.update(new_auth_info)
 
-    if not request.config.getoption("--skip-delete-endpoints"):
-        await delete_user(test_session, user)
+    elif target == "access_token":
+        value = wrong_param.get("value")
+        user["access_token"] = value
+        user["headers"] = {"Authorization": f"Bearer {value}"}
+
+    elif target == "refresh_token":
+        value = wrong_param.get("value")
+        user["refresh_token"] = value
+
+    elif target == "password":
+        value = wrong_param.get("value")
+        user["password"] = value
+
+    elif target == "headers_none":
+        user["headers"] = None
+
+    elif target == "wrong_user_id_to_request":
+        value = wrong_param.get("value")
+        user["wrong_user_id_to_request"] = value
+
+    elif target == "json_none":
+        user["json_none"] = True
+
+    elif target == "user_already_exist":
+        user["user_already_exist"] = True
+
+    elif target == "wrong_role_to_request":
+        value = wrong_param.get("value")
+        user["wrong_role_to_request"] = value
+
+    return user
 
 
-@pytest.fixture(scope="session", autouse=True)
-async def create_superuser(test_session, request):
-    """
-    Creating superuser for admin access rights checking
-    """
-    await check_and_create_superuser(
-        test_session,
-        admin_id=super_user.get("id"),
-        username=super_user.get("username"),
-        password=super_user.get("password"),
-    )
-
-    s_user = await get_user_by_id(test_session, super_user.get("id"))
-
-    yield s_user
-
-    if not request.config.getoption("--skip-delete-endpoints"):
-        await delete_user(test_session, s_user)
+@pytest.fixture
+async def mutated_user(request, test_session, auth_client, test_user):
+    return await mutated(request, test_session, auth_client, test_user)
 
 
-@pytest.fixture(scope="session")
-async def auth_user(async_client: AsyncClient):
-    """
-    Get logging test users
-    """
-    request_json = {
-        "username": test_user.username,
-        "password": test_user.password,
-    }
-    response = await async_client.post(
-        url=f"{settings.api.auth_jwt.prefix}/login/",
-        data=request_json,
-    )
-    return AuthedUser(
-        user=test_user,
-        access_token=response.json().get("access_token"),
-        refresh_token=response.json().get("refresh_token"),
-    )
-
-
-@pytest.fixture(scope="session")
-async def auth_superuser(async_client: AsyncClient):
-    request_json = super_user
-    request_json.pop("id")
-    response = await async_client.post(
-        url=f"{settings.api.auth_jwt.prefix}/login/",
-        data=request_json,
-    )
-    s_user = TestUser(*request_json)
-    return AuthedUser(
-        user=s_user,
-        access_token=response.json().get("access_token"),
-        refresh_token=response.json().get("refresh_token"),
-    )
+@pytest.fixture
+async def mutated_admin(request, test_session, auth_client, admin_user):
+    return await mutated(request, test_session, auth_client, admin_user)
