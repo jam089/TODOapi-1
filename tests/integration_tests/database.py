@@ -58,7 +58,7 @@ def pytest_configure(config):
         return
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True)
 async def prepare_db(request):
     assert settings.db.mode == "TEST"
     async with test_engine.begin() as conn:
