@@ -1,7 +1,7 @@
 services:
 
   pg:
-    image: postgres
+    image: postgres:16.8
     environment:
       POSTGRES_DB: todo_app
       POSTGRES_USER: pgadmin
@@ -10,9 +10,22 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    profiles:
+      - prime_db
+
+  test_pg:
+    image: postgres:16.8
+    environment:
+      POSTGRES_DB: test_todo_app
+      POSTGRES_USER: pgadmin
+      POSTGRES_PASSWORD: pgadmin
+    ports:
+      - "5434:5432"
+    profiles:
+      - test_db
 
   adminer:
-    image: adminer
+    image: adminer:latest
     ports:
       - "8080:8080"
 
