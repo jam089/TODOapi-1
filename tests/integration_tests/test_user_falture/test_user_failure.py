@@ -12,10 +12,6 @@ from api.http_exceptions import (
     username_already_exist_exc_templ,
     role_not_exist_exc_templ,
 )
-from integration_tests.conftest import update_scenarios
-
-
-# from integration_tests.test_user_falture.conftest import test_user, super_user
 
 
 @pytest.mark.parametrize(
