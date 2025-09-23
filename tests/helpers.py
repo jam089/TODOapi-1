@@ -1,3 +1,6 @@
+import re
+from string import Template
+
 from httpx import AsyncClient
 
 from core.config import settings
@@ -88,3 +91,14 @@ async def authentication(async_client: AsyncClient, user: User, password: str):
         "refresh_token": refresh_token,
         "headers": {"Authorization": f"Bearer {access_token}"},
     }
+
+
+def template_matches(
+    template: Template,
+    msg: str,
+    placeholder: str,
+    pattern: str = r".+",
+) -> bool:
+    regex = re.escape(template.template)
+    regex = regex.replace(rf"\${placeholder}", pattern)
+    return re.fullmatch(regex, msg) is not None
