@@ -73,6 +73,11 @@ async def test_endpoint_auth_user_login(
             401,
             token_invalid_exc.detail,
         ),
+        (
+            {"target": "user", "attrs": {"active": False}},
+            401,
+            inactive_user_exception.detail,
+        ),
     ],
     indirect=["mutated_user"],
 )
