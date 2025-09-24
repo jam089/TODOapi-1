@@ -29,7 +29,7 @@ from api.http_exceptions import inactive_user_exception, unauth_exc
 )
 @pytest.mark.asyncio
 async def test_endpoint_auth_user_login(
-    auth_client: AsyncClient,
+    async_client: AsyncClient,
     mutated_user: dict,
     expected_code,
     expected_details,
@@ -43,7 +43,7 @@ async def test_endpoint_auth_user_login(
         "password": password,
     }
     data = None if mutated_user.get("json_none") else login_data
-    response = await auth_client.post(
+    response = await async_client.post(
         url=f"{settings.api.auth_jwt.prefix}/login/",
         data=data,
     )
