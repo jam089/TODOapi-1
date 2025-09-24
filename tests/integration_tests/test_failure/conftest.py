@@ -11,6 +11,7 @@ FLG_STATEMENTS = [
     "user_already_exist",
 ]
 VALUE_STATEMENTS = [
+    "access_token",
     "refresh_token",
     "password",
     "wrong_user_id_to_request",
