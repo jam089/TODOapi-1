@@ -6,6 +6,19 @@ from core.models import User
 
 from tests.helpers import authentication
 
+FLG_STATEMENTS = [
+    "json_none",
+    "user_already_exist",
+]
+VALUE_STATEMENTS = [
+    "refresh_token",
+    "password",
+    "wrong_user_id_to_request",
+    "wrong_role_to_request",
+    "wrong_password",
+    "wrong_username",
+]
+
 
 async def mutated(
     request,
@@ -18,6 +31,7 @@ async def mutated(
     {"target": "access_token", "value": "wrong_token"}
     {"target": "user", "attrs": {"active": False}}
     """
+
     wrong_param = request.param or {}
     target = wrong_param.get("target")
 
@@ -34,35 +48,17 @@ async def mutated(
             )
             user.update(new_auth_info)
 
-    elif target == "access_token":
+    elif target in VALUE_STATEMENTS:
         value = wrong_param.get("value")
-        user["access_token"] = value
-        user["headers"] = {"Authorization": f"Bearer {value}"}
-
-    elif target == "refresh_token":
-        value = wrong_param.get("value")
-        user["refresh_token"] = value
-
-    elif target == "password":
-        value = wrong_param.get("value")
-        user["password"] = value
+        user[target] = value
+        if target == "access_token":
+            user["headers"] = {"Authorization": f"Bearer {value}"}
 
     elif target == "headers_none":
         user["headers"] = None
 
-    elif target == "wrong_user_id_to_request":
-        value = wrong_param.get("value")
-        user["wrong_user_id_to_request"] = value
-
-    elif target == "json_none":
-        user["json_none"] = True
-
-    elif target == "user_already_exist":
-        user["user_already_exist"] = True
-
-    elif target == "wrong_role_to_request":
-        value = wrong_param.get("value")
-        user["wrong_role_to_request"] = value
+    elif target in FLG_STATEMENTS:
+        user[target] = True
 
     return user
 
