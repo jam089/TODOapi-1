@@ -3,6 +3,7 @@ import pytest
 
 from core.config import settings
 from core.utils.jwt import hash_password
+from integration_tests.factories import TaskFactory
 from tests.integration_tests.database import (
     override_dispose,
     override_session_getter,
@@ -113,3 +114,15 @@ async def test_user(request, test_user_a, test_user_b):
 @pytest.fixture(params=["user_1", "user_2"])
 async def test_user_to_create(request):
     return create_users.get(request.param)
+
+
+@pytest.fixture
+async def test_task_a(test_user_a):
+    task = await create(TaskFactory, user=test_user_a.get("user"))
+    return task
+
+
+@pytest.fixture
+async def test_task_b(test_user_b):
+    task = await create(TaskFactory, user=test_user_b.get("user"))
+    return task
