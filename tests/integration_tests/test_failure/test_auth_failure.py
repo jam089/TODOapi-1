@@ -100,16 +100,36 @@ async def test_endpoint_auth_user_refresh(
     assert "set-cookie" not in response.headers
 
 
+@pytest.mark.parametrize(
+    "mutated_user, expected_code, expected_details",
+    [
+        (
+            {"target": "access_token", "value": "wrong_token"},
+            401,
+            token_invalid_exc.detail,
+        ),
+        (
+            {"target": "user", "attrs": {"active": False}},
+            401,
+            inactive_user_exception.detail,
+        ),
+        ({"target": "headers_none"}, 401, token_invalid_exc.detail),
+    ],
+    indirect=["mutated_user"],
+)
 @pytest.mark.asyncio
 async def test_endpoint_auth_user_logout(
     async_client: AsyncClient,
-    test_user,
+    mutated_user: dict,
+    expected_code,
+    expected_details,
 ):
     response = await async_client.post(
         url=f"{settings.api.auth_jwt.prefix}/logout/",
+        headers=mutated_user.get("headers"),
     )
 
-    assert response.status_code == 200
-    assert response.json().get("detail") == "Logout successful"
-    cookies = response.headers.get("set-cookie")
-    assert "Max-Age=0" in cookies
+    assert response.status_code == expected_code
+    assert response.json().get("detail") == expected_details
+    assert response.json().get("detail") != "Logout successful"
+    assert response.headers.get("set-cookie") is None
