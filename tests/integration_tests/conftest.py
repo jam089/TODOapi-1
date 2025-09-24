@@ -56,7 +56,7 @@ update_scenarios = {
 
 
 @pytest.fixture
-async def test_user_a(test_session, auth_client):
+async def test_user_a(auth_client):
     password = faker.Faker().password()
     user = await create(UserFactory, password=hash_password(password).decode())
     auth_response = await authentication(auth_client, user, password)
@@ -69,7 +69,7 @@ async def test_user_a(test_session, auth_client):
 
 
 @pytest.fixture
-async def test_user_b(test_session, auth_client):
+async def test_user_b(auth_client):
     password = faker.Faker().password()
     user = await create(UserFactory, password=hash_password(password).decode())
     auth_response = await authentication(auth_client, user, password)
@@ -82,7 +82,7 @@ async def test_user_b(test_session, auth_client):
 
 
 @pytest.fixture
-async def admin_user(test_session, auth_client):
+async def admin_user(auth_client):
     password = faker.Faker().password()
     user = await create(
         UserFactory,
