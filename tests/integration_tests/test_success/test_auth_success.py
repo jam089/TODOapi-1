@@ -29,9 +29,9 @@ async def test_endpoint_auth_user_refresh(
     async_client: AsyncClient,
     test_user,
 ):
+    async_client.cookies.set("refresh_token", test_user.get("refresh_token"))
     response = await async_client.post(
         url=f"{settings.api.auth_jwt.prefix}/refresh/",
-        cookies={"refresh_token": test_user.get("refresh_token")},
     )
     assert response.status_code == 200
     assert "access_token" in response.json().keys()
