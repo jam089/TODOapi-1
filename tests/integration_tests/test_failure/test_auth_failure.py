@@ -51,3 +51,6 @@ async def test_endpoint_auth_user_login(
     assert response.status_code == expected_code
     if expected_details:
         assert response.json().get("detail") == expected_details
+    assert "access_token" not in response.json().keys()
+    assert "refresh_token" not in response.json().keys()
+    assert "set-cookie" not in response.headers
