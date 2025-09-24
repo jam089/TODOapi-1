@@ -2,7 +2,11 @@ import pytest
 from httpx import AsyncClient
 
 from core.config import settings
-from api.http_exceptions import inactive_user_exception, unauth_exc
+from api.http_exceptions import (
+    inactive_user_exception,
+    unauth_exc,
+    token_invalid_exc,
+)
 
 
 @pytest.mark.parametrize(
@@ -53,4 +57,41 @@ async def test_endpoint_auth_user_login(
         assert response.json().get("detail") == expected_details
     assert "access_token" not in response.json().keys()
     assert "refresh_token" not in response.json().keys()
+    assert "set-cookie" not in response.headers
+
+
+@pytest.mark.parametrize(
+    "mutated_user, expected_code, expected_details",
+    [
+        (
+            {"target": "access_token", "value": "wrong_access_token"},
+            401,
+            token_invalid_exc.detail,
+        ),
+        (
+            {"target": "refresh_token", "value": "wrong_refresh_token"},
+            401,
+            token_invalid_exc.detail,
+        ),
+        (
+            {"target": "headers_none"},
+            401,
+            token_invalid_exc.detail,
+        ),
+    ],
+    indirect=["mutated_user"],
+)
+@pytest.mark.asyncio
+async def test_endpoint_auth_user_refresh(
+    async_client: AsyncClient,
+    mutated_user: dict,
+    expected_code,
+    expected_details,
+):
+    response = await async_client.post(
+        url=f"{settings.api.auth_jwt.prefix}/refresh/",
+    )
+    assert response.status_code == expected_code
+    assert response.json().get("detail") == expected_details
+    assert "access_token" not in response.json().keys()
     assert "set-cookie" not in response.headers
