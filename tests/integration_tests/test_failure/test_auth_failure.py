@@ -88,9 +88,11 @@ async def test_endpoint_auth_user_refresh(
     expected_code,
     expected_details,
 ):
+    cookies_dict = {"refresh_token": mutated_user.get("refresh_token")}
+    cookies = None if mutated_user.get("headers") is None else cookies_dict
     response = await async_client.post(
         url=f"{settings.api.auth_jwt.prefix}/refresh/",
-        headers=mutated_user.get("headers"),
+        cookies=cookies,
     )
     assert response.status_code == expected_code
     assert response.json().get("detail") == expected_details
