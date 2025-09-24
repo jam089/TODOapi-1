@@ -32,7 +32,21 @@ async def test_endpoint_auth_user_refresh(
     response = await auth_client.post(
         url=f"{settings.api.auth_jwt.prefix}/refresh/",
     )
-
     assert response.status_code == 200
     assert "access_token" in response.json().keys()
     assert "set-cookie" in response.headers
+
+
+@pytest.mark.asyncio
+async def test_endpoint_auth_user_logout(
+    auth_client: AsyncClient,
+    test_user,
+):
+    response = await auth_client.post(
+        url=f"{settings.api.auth_jwt.prefix}/logout/",
+    )
+
+    assert response.status_code == 200
+    assert response.json().get("detail") == "Logout successful"
+    cookies = response.headers.get("set-cookie")
+    assert "Max-Age=0" in cookies
