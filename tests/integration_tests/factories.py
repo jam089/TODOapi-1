@@ -1,3 +1,5 @@
+from typing import Type
+
 import factory
 
 from core.models import User
@@ -15,6 +17,7 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
 
 
 async def create(factory_class: factory.alchemy.SQLAlchemyModelFactory, **kwargs):
+async def create(factory_class: Type[factory.alchemy.SQLAlchemyModelFactory], **kwargs):
     obj = factory_class.build(**kwargs)
     async with test_session_factory() as session:
         session.add(obj)
