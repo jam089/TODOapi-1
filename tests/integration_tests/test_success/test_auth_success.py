@@ -6,14 +6,14 @@ from core.config import settings
 
 @pytest.mark.asyncio
 async def test_endpoint_auth_user_login(
-    auth_client: AsyncClient,
+    async_client: AsyncClient,
     test_user,
 ):
     login_data = {
         "username": test_user.get("user").username,
         "password": test_user.get("password"),
     }
-    response = await auth_client.post(
+    response = await async_client.post(
         url=f"{settings.api.auth_jwt.prefix}/login/",
         data=login_data,
     )
@@ -26,11 +26,12 @@ async def test_endpoint_auth_user_login(
 
 @pytest.mark.asyncio
 async def test_endpoint_auth_user_refresh(
-    auth_client: AsyncClient,
+    async_client: AsyncClient,
     test_user,
 ):
-    response = await auth_client.post(
+    response = await async_client.post(
         url=f"{settings.api.auth_jwt.prefix}/refresh/",
+        cookies={"refresh_token": test_user.get("refresh_token")},
     )
     assert response.status_code == 200
     assert "access_token" in response.json().keys()
@@ -39,11 +40,12 @@ async def test_endpoint_auth_user_refresh(
 
 @pytest.mark.asyncio
 async def test_endpoint_auth_user_logout(
-    auth_client: AsyncClient,
+    async_client: AsyncClient,
     test_user,
 ):
-    response = await auth_client.post(
+    response = await async_client.post(
         url=f"{settings.api.auth_jwt.prefix}/logout/",
+        headers=test_user.get("headers"),
     )
 
     assert response.status_code == 200
