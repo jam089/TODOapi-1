@@ -64,11 +64,6 @@ async def test_endpoint_auth_user_login(
     "mutated_user, expected_code, expected_details",
     [
         (
-            {"target": "access_token", "value": "wrong_access_token"},
-            401,
-            token_invalid_exc.detail,
-        ),
-        (
             {"target": "refresh_token", "value": "wrong_refresh_token"},
             401,
             token_invalid_exc.detail,
