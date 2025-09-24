@@ -13,7 +13,7 @@ from tests.integration_tests.database import (
     async_client,
     auth_client,
 )
-from tests.integration_tests.factories import UserFactory
+from tests.integration_tests.factories import UserFactory, create
 from tests.helpers import authentication
 
 
@@ -58,12 +58,7 @@ update_scenarios = {
 @pytest.fixture
 async def test_user_a(test_session, auth_client):
     password = faker.Faker().password()
-    user = UserFactory.build(
-        password=hash_password(password).decode(),
-    )
-    test_session.add(user)
-    await test_session.commit()
-    await test_session.refresh(user)
+    user = await create(UserFactory, password=hash_password(password).decode())
     auth_response = await authentication(auth_client, user, password)
     return {
         "user": user,
@@ -76,14 +71,7 @@ async def test_user_a(test_session, auth_client):
 @pytest.fixture
 async def test_user_b(test_session, auth_client):
     password = faker.Faker().password()
-    user = UserFactory.build(
-        name=None,
-        b_date=None,
-        password=hash_password(password).decode(),
-    )
-    test_session.add(user)
-    await test_session.commit()
-    await test_session.refresh(user)
+    user = await create(UserFactory, password=hash_password(password).decode())
     auth_response = await authentication(auth_client, user, password)
     return {
         "user": user,
@@ -96,15 +84,13 @@ async def test_user_b(test_session, auth_client):
 @pytest.fixture
 async def admin_user(test_session, auth_client):
     password = faker.Faker().password()
-    user = UserFactory.build(
+    user = await create(
+        UserFactory,
         name=None,
         b_date=None,
         role=settings.roles.admin,
         password=hash_password(password).decode(),
     )
-    test_session.add(user)
-    await test_session.commit()
-    await test_session.refresh(user)
     auth_response = await authentication(auth_client, user, password)
     return {
         "user": user,
