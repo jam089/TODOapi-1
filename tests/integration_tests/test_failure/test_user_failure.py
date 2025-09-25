@@ -216,7 +216,7 @@ async def test_endpoint_update_yourself(
     expected_code,
     expected_details,
 ):
-    json = mutated_user.get("update_scenarios")
+    json = mutated_user.get("update_user_scenarios")
     if mutated_user.get("json_none"):
         json = None
     elif mutated_user.get("user_already_exist"):
@@ -416,7 +416,7 @@ async def test_admin_endpoint_update_user(
     expected_details,
 ):
     wrong_user_id = mutated_admin.get("wrong_user_id_to_request")
-    update_scenario = test_user.get("update_scenarios").get("admin")
+    update_scenario = test_user.get("update_user_scenarios").get("admin")
     json = None if mutated_admin.get("json_none") else update_scenario
     if mutated_admin.get("user_already_exist"):
         json.update({"username": mutated_admin.get("user").username})

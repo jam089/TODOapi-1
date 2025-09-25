@@ -93,7 +93,7 @@ async def test_endpoint_create_user(async_client: AsyncClient, test_user_to_crea
 
 @pytest.mark.asyncio
 async def test_endpoint_update_yourself(async_client, test_user):
-    update_dict = test_user.get("update_scenarios").get("user")
+    update_dict = test_user.get("update_user_scenarios").get("user")
     response = await async_client.patch(
         url=f"{settings.api.user.prefix}/",
         json=update_dict,
@@ -167,7 +167,7 @@ async def test_admin_endpoint_update_user(
     test_user,
     admin_user,
 ):
-    update_dict = test_user.get("update_scenarios").get("admin")
+    update_dict = test_user.get("update_user_scenarios").get("admin")
     response = await async_client.patch(
         url=f"{settings.api.user.prefix}/{test_user.get("user").id}/",
         json=update_dict,

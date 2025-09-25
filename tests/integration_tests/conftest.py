@@ -3,6 +3,12 @@ import pytest
 
 from core.config import settings
 from core.utils.jwt import hash_password
+from integration_tests.create_update_scenarios import (
+    create_users,
+    create_tasks,
+    update_user_scenarios,
+    update_task_scenarios,
+)
 from integration_tests.factories import TaskFactory
 from tests.integration_tests.database import (
     override_dispose,
@@ -18,44 +24,6 @@ from tests.integration_tests.factories import UserFactory, create
 from tests.helpers import authentication
 
 
-create_users = {
-    "user_1": {
-        "username": faker.Faker().user_name(),
-        "password": faker.Faker().password(),
-        "name": faker.Faker().name(),
-        "b_date": faker.Faker().date_of_birth().strftime("%Y-%m-%d"),
-    },
-    "user_2": {
-        "username": faker.Faker().user_name(),
-        "password": faker.Faker().password(),
-    },
-}
-
-update_scenarios = {
-    "test_user_a": {
-        "admin": {
-            "username": "jackson",
-            "name": "Jack N",
-        },
-        "user": {
-            "username": "jack_nicholson",
-            "name": "Jack Nicholson",
-            "b_date": "2000-12-01",
-            "active": True,
-        },
-    },
-    "test_user_b": {
-        "admin": {
-            "username": "john_doe2",
-        },
-        "user": {
-            "username": "johnny_d",
-            "name": "Johnny",
-        },
-    },
-}
-
-
 @pytest.fixture
 async def test_user_a(auth_client):
     password = faker.Faker().password()
@@ -64,7 +32,7 @@ async def test_user_a(auth_client):
     return {
         "user": user,
         "password": password,
-        "update_scenarios": update_scenarios.get("test_user_a"),
+        "update_user_scenarios": update_user_scenarios.get("test_user_a"),
         **auth_response,
     }
 
@@ -77,7 +45,7 @@ async def test_user_b(auth_client):
     return {
         "user": user,
         "password": password,
-        "update_scenarios": update_scenarios.get("test_user_b"),
+        "update_user_scenarios": update_user_scenarios.get("test_user_b"),
         **auth_response,
     }
 
