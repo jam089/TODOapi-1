@@ -90,7 +90,6 @@ async def get_user_all_tasks(
     description=f"Authentication and {settings.roles.admin} role is required",
 )
 async def get_task_by_task_id(
-    # session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     task: Annotated[Task, Depends(deps.get_task)],
     _admin: Annotated[UserSchmExtended, Depends(get_currant_auth_user_with_admin)],
 ):
