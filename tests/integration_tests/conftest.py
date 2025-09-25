@@ -51,6 +51,18 @@ async def test_user_b(auth_client):
 
 
 @pytest.fixture
+async def test_user_c(auth_client):
+    password = faker.Faker().password()
+    user = await create(UserFactory, password=hash_password(password).decode())
+    auth_response = await authentication(auth_client, user, password)
+    return {
+        "user": user,
+        "password": password,
+        **auth_response,
+    }
+
+
+@pytest.fixture
 async def admin_user(auth_client):
     password = faker.Faker().password()
     user = await create(
@@ -86,11 +98,74 @@ async def test_user_to_create(request):
 
 @pytest.fixture
 async def test_task_a(test_user_a):
-    task = await create(TaskFactory, user=test_user_a.get("user"))
-    return task
+    user = test_user_a.get("user")
+    task = await create(TaskFactory, user=user)
+    return {
+        "task": task,
+        "user": user,
+        "update_scenarios": update_task_scenarios.get("test_task_a"),
+        **test_user_a,
+    }
 
 
 @pytest.fixture
 async def test_task_b(test_user_b):
-    task = await create(TaskFactory, user=test_user_b.get("user"))
-    return task
+    user = test_user_b.get("user")
+    task = await create(TaskFactory, user=user)
+    return {
+        "task": task,
+        "user": user,
+        "update_scenarios": update_task_scenarios.get("test_task_b"),
+        **test_user_b,
+    }
+
+
+@pytest.fixture(params=["test_task_a", "test_task_b"])
+async def test_task(request, test_task_a, test_task_b):
+    match request.param:
+        case "test_task_a":
+            return test_task_a
+        case "test_task_b":
+            return test_task_b
+        case _:
+            return None
+
+
+@pytest.fixture
+async def test_multiple_tasks_a(test_user_a):
+    task_list = [
+        await create(TaskFactory, user=test_user_a.get("user")) for _ in range(4)
+    ]
+    return {
+        "task_list": task_list,
+        "user": test_user_a.get("user"),
+        **test_user_a,
+    }
+
+
+@pytest.fixture
+async def test_multiple_tasks_b(test_user_b):
+    task_list = [
+        await create(TaskFactory, user=test_user_b.get("user")) for _ in range(4)
+    ]
+    return {
+        "task_list": task_list,
+        "user": test_user_b.get("user"),
+        **test_user_b,
+    }
+
+
+@pytest.fixture(params=["test_multiple_tasks_a", "test_multiple_tasks_b"])
+async def test_multiple_tasks(request, test_multiple_tasks_a, test_multiple_tasks_b):
+    match request.param:
+        case "test_multiple_tasks_a":
+            return test_multiple_tasks_a
+        case "test_multiple_tasks_b":
+            return test_multiple_tasks_b
+        case _:
+            return None
+
+
+@pytest.fixture(params=["task_1", "task_2"])
+async def test_task_to_create(request):
+    return create_tasks.get(request.param)
