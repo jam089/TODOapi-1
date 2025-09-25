@@ -58,7 +58,7 @@ async def test_endpoint_search_task_by_parameters(
     for key in search_attr_list:
         value = getattr(task, key)
         if value is None:
-            pytest.skip(f"У задачи нет значения для поля {key}")
+            pytest.skip(f"No value for field {key}")
 
         if hasattr(value, "isoformat"):
             value = value.isoformat()
