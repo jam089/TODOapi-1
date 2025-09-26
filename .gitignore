@@ -5,3 +5,4 @@
 .python-version
 /htmlcov
 .coverage
+.secrets
