@@ -19,7 +19,7 @@ jobs:
       - name: Run prestart script
         run: |
           chmod +x ./TODOapp/prestart.sh
-          ./TODOapp/prestart.sh
+          ./tests/prestart.sh
       - name: Run unit-tests
         run: poetry run pytest tests/unit_tests -v
 
