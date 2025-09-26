@@ -12,7 +12,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: pip install poetry
-      - run: poetry install --with dev
-      - run: pytest tests/unit_tests -v
+      - name: Install deps
+        run: |
+          pip install poetry
+          poetry install --with dev
+      - name: Run unit-tests
+        run: poetry run pytest tests/unit_tests -v
 
