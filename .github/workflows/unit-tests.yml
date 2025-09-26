@@ -18,7 +18,8 @@ jobs:
           poetry install --with dev
       - name: Run prestart script
         run: |
-          bush ./TODOapp/prestart.sh
+          chmod +x ./TODOapp/prestart.sh
+          ./TODOapp/prestart.sh
       - name: Run unit-tests
         run: poetry run pytest tests/unit_tests -v
 
