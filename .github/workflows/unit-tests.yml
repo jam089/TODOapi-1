@@ -3,6 +3,9 @@ name: Unit tests
 on:
   push:
     branches: ["main"]
+    paths-ignore:
+      - .github/workflows/integration-tests.yml
+      - tests/integration_tests/
   pull_request:
 
 jobs:
