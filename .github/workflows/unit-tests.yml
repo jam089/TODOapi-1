@@ -13,6 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: pip install poetry
-      - run: poetry install
+      - run: poetry install --with dev
       - run: pytest tests/unit_tests -v
 
