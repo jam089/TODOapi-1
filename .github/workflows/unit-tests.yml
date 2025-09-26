@@ -32,10 +32,10 @@ jobs:
           name: pytest-results
           path: pytest-results.xml
       - name: Publish Test Report
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2.1.1
         if: always()
         with:
           name: Pytest Results
           path: pytest-results.xml
-          reporter: junit
+          reporter: java-junit
 
