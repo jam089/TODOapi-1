@@ -12,10 +12,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Install deps
+      - name: Install poetry and deps
         run: |
           pip install poetry
           poetry install --with dev
+      - name: Run prestart script
+        run: |
+          bush ./TODOapp/prestart.sh
       - name: Run unit-tests
         run: poetry run pytest tests/unit_tests -v
 
