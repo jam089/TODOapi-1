@@ -6,7 +6,7 @@ on:
 jobs:
   integration:
     runs-on: ubuntu-latest
-
+    container: python:3.12.10
     services:
       postgres:
         image: postgres:16.8
@@ -17,19 +17,22 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.TODO_TEST_POSTGRES_PASSWORDS }}
           POSTGRES_DB: ${{ secrets.TODO_TEST_POSTGRES_DB }}
         options: >-
-          --health-cmd "pg_isready -U ${{ secrets.TODO_TEST_POSTGRES_USER }}"
+          --health-cmd "pg_isready"
           --health-interval 5s
           --health-timeout 3s
           --health-retries 3
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+#      - uses: actions/setup-python@v5
       - name: Install poetry and deps
         run: |
-          pip install poetry
+          pip install "poetry==2.1.2"
           poetry install --with dev
       - name: Run Integration tests
-        run: poetry run pytest tests/integration_tests -v
+        run: |
+          chmod +x tests/test_prestart.sh
+          tests/test_prestart.sh
+          poetry run pytest tests/integration_tests -v
         env:
           TODOAPP__DB__URL: ${{ secrets.TODO_TEST_DATABASE_URL }}
           TODOAPP__DB__ECHO: 0
