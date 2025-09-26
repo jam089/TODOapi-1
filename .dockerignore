@@ -1,0 +1,9 @@
+.idea/
+.venv/
+.htmlcov/
+.tests/
+.coverage
+*.md
+.python-version
+*/certs
+.env*
