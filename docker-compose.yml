@@ -1,5 +1,29 @@
 services:
 
+  app:
+    build:
+      dockerfile: ./docker-build/Dockerfile
+      context: ./
+    environment:
+      TODOAPP__DB__URL: postgresql+asyncpg://pgadmin:pgadmin@pg:5432/todo_app
+      TODOAPP__DB__ECHO : 0
+      TODOAPP__DB__ECHO_POOL: 0
+      TODOAPP__DB__MODE: DEV
+      TODOAPP__RUN__RELOAD: 1
+    profiles: ["test", "dev"]
+    ports:
+      - 8000:8000
+    depends_on:
+      pg:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./TODOapp
+          target: /app
+        - action: rebuild
+          path: ./poetry.lock
+
   pg:
     image: postgres:16.8
     environment:
@@ -10,8 +34,12 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    profiles:
-      - prime_db
+    profiles: ["dev"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
 
   test_pg:
     image: postgres:16.8
@@ -21,13 +49,18 @@ services:
       POSTGRES_PASSWORD: pgadmin
     ports:
       - "5434:5432"
-    profiles:
-      - test_db
+    profiles: ["test"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
 
   adminer:
     image: adminer:latest
     ports:
       - "8080:8080"
+    profiles: ["dev", "test"]
 
 volumes:
   pgdata:
