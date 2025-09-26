@@ -21,5 +21,17 @@ jobs:
           chmod +x ./tests/test_prestart.sh
           ./tests/test_prestart.sh
       - name: Run unit-tests
-        run: poetry run pytest tests/unit_tests -v
+        run: poetry run pytest tests/unit_tests -v --junitxml=pytest-results.xml
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: pytest-results.xml
+      - name: Publish Test Report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Pytest Results
+          path: pytest-results.xml
+          reporter: junit
 
