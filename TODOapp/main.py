@@ -21,10 +21,15 @@ todo_app = FastAPI(lifespan=lifespan)
 
 todo_app.include_router(api_router)
 
-if __name__ == "__main__":
+
+def main():
     uvicorn.run(
         "main:todo_app",
         host=settings.run.host,
         port=settings.run.port,
         reload=settings.run.reload,
     )
+
+
+if __name__ == "__main__":
+    main()
