@@ -24,6 +24,8 @@ jobs:
           ./tests/test_prestart.sh
       - name: Run unit-tests
         run: poetry run pytest tests/unit_tests -v --junitxml=pytest-results.xml
+      - name: Mark repo as safe
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
