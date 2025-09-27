@@ -1,15 +1,12 @@
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import pytest
-from sqlalchemy import NullPool, text
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from httpx import AsyncClient, ASGITransport
-
-from core.models import db_helper, Base
-
 from core.config import settings
+from core.models import Base, db_helper
+from httpx import ASGITransport, AsyncClient
 from main import todo_app
-
+from sqlalchemy import NullPool, text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 test_engine = create_async_engine(
     url=str(settings.db.url),

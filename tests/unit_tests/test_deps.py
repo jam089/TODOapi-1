@@ -1,7 +1,6 @@
 import pytest
+from api.deps import get_task, get_user
 from fastapi import HTTPException
-
-from api.deps import get_user, get_task
 
 
 @pytest.mark.asyncio

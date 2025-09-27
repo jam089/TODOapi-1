@@ -1,6 +1,5 @@
-from factory.faker import faker
-
 from core.config import settings
+from factory.faker import faker
 
 create_users = {
     "user_1": {

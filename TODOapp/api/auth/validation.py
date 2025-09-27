@@ -1,26 +1,26 @@
 from typing import Annotated
 
+from core.config import settings
+from core.crud.user import get_user_by_id, get_user_by_username
+from core.models import User, db_helper
+from core.utils.jwt import check_password, decode_jwt
 from fastapi import Depends
 from jwt import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.config import settings
-from core.models import db_helper, User
-from .utils import (
-    TOKEN_TYPE_FIELD,
-    ACCESS_TOKEN_TYPE,
-    REFRESH_TOKEN_TYPE,
-    get_token_of_type,
-)
-from ..schemas import UserSchmExtended
 from ..http_exceptions import (
+    inactive_user_exception,
+    no_priv_except,
     token_invalid_exc,
     unauth_exc,
-    no_priv_except,
-    inactive_user_exception,
 )
-from core.crud.user import get_user_by_id, get_user_by_username
-from core.utils.jwt import decode_jwt, check_password
+from ..schemas import UserSchmExtended
+from .utils import (
+    ACCESS_TOKEN_TYPE,
+    REFRESH_TOKEN_TYPE,
+    TOKEN_TYPE_FIELD,
+    get_token_of_type,
+)
 
 
 def validate_token_type(
@@ -52,8 +52,8 @@ def get_currant_token_payload_of_token_type(
     ) -> dict:
         try:
             payload = decode_jwt(token)
-        except InvalidTokenError:
-            raise token_invalid_exc
+        except InvalidTokenError as err:
+            raise token_invalid_exc from err
         return payload
 
     return get_currant_token_payload
@@ -71,9 +71,8 @@ def get_auth_user_from_token_of_type(
         ],
     ) -> UserSchmExtended:
         validate_token_type(payload, token_type)
-        if user_role_to_check is not None:
-            if payload.get("role") != user_role_to_check:
-                raise no_priv_except
+        if user_role_to_check and payload.get("role") != user_role_to_check:
+            raise no_priv_except
         return await get_user_from_payload(session, payload)
 
     return get_auth_user_from_token

@@ -1,11 +1,10 @@
 import datetime
 
 import pytest
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from core.config import settings
 from core.crud.user import get_all_users
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @pytest.mark.asyncio

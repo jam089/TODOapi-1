@@ -1,10 +1,9 @@
+from core.config import settings
 from fastapi import APIRouter
 
-from core.config import settings
-
-from .views.user import router as user_router
-from .views.task import router as task_router
 from .auth.auth import router as auth_router
+from .views.task import router as task_router
+from .views.user import router as user_router
 
 router = APIRouter(prefix=settings.api.prefix)
 router.include_router(

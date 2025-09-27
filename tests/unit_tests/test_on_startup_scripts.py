@@ -1,6 +1,6 @@
-import pytest
 from unittest.mock import AsyncMock
 
+import pytest
 from core.models import User
 from core.utils.on_startup_scripts import check_and_create_superuser
 

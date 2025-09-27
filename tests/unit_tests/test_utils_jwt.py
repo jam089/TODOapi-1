@@ -1,9 +1,7 @@
-from datetime import datetime, UTC, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
-
-from core.utils.jwt import encode_jwt, decode_jwt
-from core.utils.jwt import hash_password, check_password
+from core.utils.jwt import check_password, decode_jwt, encode_jwt, hash_password
 
 
 def test_encode_decode_jwt(jwt_payload_example, jwt_config):

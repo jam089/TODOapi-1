@@ -1,7 +1,6 @@
 import pytest
-from httpx import AsyncClient
-
 from core.config import settings
+from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
@@ -19,8 +18,8 @@ async def test_endpoint_auth_user_login(
     )
 
     assert response.status_code == 200
-    assert "access_token" in response.json().keys()
-    assert "refresh_token" in response.json().keys()
+    assert "access_token" in response.json()
+    assert "refresh_token" in response.json()
     assert "set-cookie" in response.headers
 
 
@@ -34,7 +33,7 @@ async def test_endpoint_auth_user_refresh(
         url=f"{settings.api.auth_jwt.prefix}/refresh/",
     )
     assert response.status_code == 200
-    assert "access_token" in response.json().keys()
+    assert "access_token" in response.json()
     assert "set-cookie" in response.headers
 
 

@@ -1,17 +1,16 @@
 import pytest
-from fastapi import HTTPException
-from jwt import InvalidTokenError
-
 from api.auth.validation import (
     ACCESS_TOKEN_TYPE,
     REFRESH_TOKEN_TYPE,
     TOKEN_TYPE_FIELD,
-    validate_token_type,
-    get_user_from_payload,
-    get_currant_token_payload_of_token_type,
-    get_auth_user_from_token_of_type,
     get_auth_user_from_db,
+    get_auth_user_from_token_of_type,
+    get_currant_token_payload_of_token_type,
+    get_user_from_payload,
+    validate_token_type,
 )
+from fastapi import HTTPException
+from jwt import InvalidTokenError
 
 
 def make_get_user_by_mock(user_mock):

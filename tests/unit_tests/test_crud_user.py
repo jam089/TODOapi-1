@@ -1,5 +1,4 @@
 import pytest
-
 from core.crud.user import _create_user_helper
 
 

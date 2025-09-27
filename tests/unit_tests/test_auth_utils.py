@@ -1,15 +1,14 @@
-import uuid
 import time
-
-import pytest
+import uuid
 from unittest.mock import Mock
 
+import pytest
 from api.auth.utils import (
-    create_token,
+    ACCESS_TOKEN_TYPE,
     create_access_token,
     create_refresh_token,
+    create_token,
     get_token_of_type,
-    ACCESS_TOKEN_TYPE,
 )
 
 
@@ -79,7 +78,7 @@ def test_create_refresh_token(mocker, user_mock):
     args, kwargs = create_token_mock.call_args
     payload = kwargs["payload"]
 
-    assert "expire_timedelta" in kwargs.keys()
+    assert "expire_timedelta" in kwargs
     assert set(payload.keys()) == expected_keys
     assert payload["sub"] == user.id
 

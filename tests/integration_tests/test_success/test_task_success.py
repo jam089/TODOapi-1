@@ -1,13 +1,12 @@
 from datetime import datetime
 
 import pytest
+from api.schemas import UserSchmExtended
+from api.schemas.task import TaskSchm
+from core.config import settings
+from core.crud import task as task_crud
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from api.schemas import UserSchmExtended
-from core.config import settings
-from api.schemas.task import TaskSchm
-from core.crud import task as task_crud
 
 
 @pytest.mark.asyncio

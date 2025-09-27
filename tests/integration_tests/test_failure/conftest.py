@@ -1,8 +1,7 @@
 import pytest
+from core.models import User
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from core.models import User
 
 from tests.helpers import authentication
 
@@ -49,7 +48,7 @@ async def mutated(
             setattr(user_obj, attr, value)
         await test_session.commit()
         await test_session.refresh(user_obj)
-        if "role" in attrs.keys():
+        if "role" in attrs:
             new_auth_info = await authentication(
                 async_client, user_obj, obj_dict.get("password")
             )

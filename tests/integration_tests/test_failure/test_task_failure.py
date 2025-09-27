@@ -1,22 +1,17 @@
-from datetime import datetime
 
 import pytest
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from api.http_exceptions import (
-    rendering_exception_with_param,
-    token_invalid_exc,
     inactive_user_exception,
     no_priv_except,
-    user_id_exc_templ,
-    task_id_exc_templ,
+    rendering_exception_with_param,
     status_exception_templ,
+    task_id_exc_templ,
+    token_invalid_exc,
+    user_id_exc_templ,
 )
-from api.schemas import UserSchmExtended
 from core.config import settings
-from api.schemas.task import TaskSchm
-from core.crud import task as task_crud
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @pytest.mark.parametrize(

@@ -1,12 +1,11 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
 import uvicorn
-
+from api import router as api_router
 from core.config import settings
 from core.models import db_helper
-from api import router as api_router
 from core.utils.on_startup_scripts import check_and_create_superuser
+from fastapi import FastAPI
 
 
 @asynccontextmanager

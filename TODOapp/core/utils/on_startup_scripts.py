@@ -1,8 +1,8 @@
+from api.schemas.user import CreateAdminUserSchm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import settings
-from core.crud.user import create_user, update_role, get_user_by_id
-from api.schemas.user import CreateAdminUserSchm
+from core.crud.user import create_user, get_user_by_id, update_role
 
 
 async def check_and_create_superuser(

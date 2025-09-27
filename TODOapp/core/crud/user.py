@@ -1,11 +1,11 @@
-from typing import Sequence
+from collections.abc import Sequence
 
+from api.schemas import CreateAdminUserSchm, CreateUserSchm, UpdateUserSchm
+from sqlalchemy import Result, ScalarResult, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, Result, ScalarResult
 
 from core.models import User
 from core.utils.jwt import hash_password
-from api.schemas import CreateUserSchm, UpdateUserSchm, CreateAdminUserSchm
 
 
 async def get_all_users(session: AsyncSession) -> Sequence[User]:

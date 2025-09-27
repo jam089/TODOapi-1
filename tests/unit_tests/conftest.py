@@ -1,10 +1,9 @@
+from datetime import datetime
 from typing import Any
 
 import pytest
-from datetime import datetime
-
-from core.models import User, Task
 from core.config import settings
+from core.models import Task, User
 
 
 @pytest.fixture(scope="package")

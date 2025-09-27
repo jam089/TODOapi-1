@@ -1,27 +1,17 @@
-from factory.faker import faker
 import pytest
-
 from core.config import settings
 from core.utils.jwt import hash_password
+from factory.faker import faker
 from integration_tests.create_update_scenarios import (
-    create_users,
     create_tasks,
-    update_user_scenarios,
+    create_users,
     update_task_scenarios,
+    update_user_scenarios,
 )
 from integration_tests.factories import TaskFactory
-from tests.integration_tests.database import (
-    override_dispose,
-    override_session_getter,
-    pytest_addoption,
-    pytest_configure,
-    prepare_db,
-    test_session,
-    async_client,
-    auth_client,
-)
-from tests.integration_tests.factories import UserFactory, create
+
 from tests.helpers import authentication
+from tests.integration_tests.factories import UserFactory, create
 
 
 @pytest.fixture

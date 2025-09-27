@@ -1,27 +1,28 @@
-from typing import Annotated, Sequence
+from collections.abc import Sequence
+from typing import Annotated
 
+from core.config import settings
+from core.crud import task as crud
+from core.models import Task, db_helper
+from core.models.user import User as UserModel
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.auth.validation import get_currant_auth_user_with_admin, get_currant_auth_user
-from api.schemas import (
-    TaskSchm,
-    UserSchmExtended,
-    CreateTaskSchm,
-    UpdateTaskSchm,
-    SearchTaskSchm,
-)
 from api import deps
+from api.auth.validation import get_currant_auth_user, get_currant_auth_user_with_admin
 from api.http_exceptions import (
-    rendering_exception_with_param,
     no_priv_except,
-    task_id_exc_templ,
+    rendering_exception_with_param,
     status_exception_templ,
+    task_id_exc_templ,
 )
-from core.config import settings
-from core.models import db_helper, Task
-from core.models.user import User as UserModel
-from core.crud import task as crud
+from api.schemas import (
+    CreateTaskSchm,
+    SearchTaskSchm,
+    TaskSchm,
+    UpdateTaskSchm,
+    UserSchmExtended,
+)
 
 router = APIRouter()
 

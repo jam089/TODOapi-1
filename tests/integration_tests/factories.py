@@ -1,10 +1,9 @@
 from datetime import timedelta
-from typing import Type
 
 import factory
-
 from core.config import settings
-from core.models import User, Task
+from core.models import Task, User
+
 from tests.integration_tests.database import test_session_factory
 
 
@@ -32,7 +31,7 @@ class TaskFactory(factory.alchemy.SQLAlchemyModelFactory):
     user = factory.SubFactory(UserFactory)
 
 
-async def create(factory_class: Type[factory.alchemy.SQLAlchemyModelFactory], **kwargs):
+async def create(factory_class: type[factory.alchemy.SQLAlchemyModelFactory], **kwargs):
     obj = factory_class.build(**kwargs)
     async with test_session_factory() as session:
         session.add(obj)

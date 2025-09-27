@@ -1,7 +1,6 @@
 import pytest
-from fastapi import HTTPException, status
-
 from api.http_exceptions import rendering_exception_with_param
+from fastapi import HTTPException, status
 
 
 def test_rendering_exception_with_valid_template():

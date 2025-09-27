@@ -1,12 +1,11 @@
-from datetime import timedelta, datetime, UTC
 import uuid
-
-from fastapi import Request, Response, Depends
-from fastapi.security import OAuth2PasswordBearer
+from datetime import UTC, datetime, timedelta
 
 from core.config import settings
-from core.utils.jwt import encode_jwt
 from core.models import User
+from core.utils.jwt import encode_jwt
+from fastapi import Depends, Request, Response
+from fastapi.security import OAuth2PasswordBearer
 
 TOKEN_TYPE_FIELD = "type"
 ACCESS_TOKEN_TYPE = "access_token"

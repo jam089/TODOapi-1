@@ -1,13 +1,12 @@
 import pytest
-from fastapi import HTTPException
-
 from api.views.task import (
-    search_task_by_parameters,
     change_task_owner,
-    update_task,
     delete_task,
+    search_task_by_parameters,
+    update_task,
 )
 from core.config import settings
+from fastapi import HTTPException
 
 
 @pytest.mark.asyncio
@@ -15,7 +14,7 @@ from core.config import settings
     "task_id",
     [0, 1, 2],
 )
-async def test_search_task_by_parameters(mocker, user_mock, task_mock, task_id):
+async def test_search_task_by_parameters_success(mocker, user_mock, task_mock, task_id):
     session_mock = mocker.AsyncMock()
     expect_task = task_mock(task_id)
     cur_user = user_mock(0)
@@ -32,7 +31,7 @@ async def test_search_task_by_parameters(mocker, user_mock, task_mock, task_id):
 
 
 @pytest.mark.asyncio
-async def test_search_task_by_parameters(mocker, user_mock, task_mock):
+async def test_search_task_by_parameters_bad_request(mocker, user_mock, task_mock):
     session_mock = mocker.AsyncMock()
     expect_task = task_mock(3)
     cur_user = user_mock(0)
@@ -78,7 +77,6 @@ async def test_change_task_owner_success(mocker, user_mock, task_mock, cur_user_
 @pytest.mark.asyncio
 async def test_change_task_owner_privileges_exc(mocker, user_mock, task_mock):
     session_mock = mocker.AsyncMock()
-    cur_user = user_mock(0)
     task_id = 1
     expect_task = task_mock(task_id)
     new_user = user_mock(1)
@@ -208,7 +206,7 @@ async def test_delete_task_privileges_exc(mocker, user_mock, task_mock):
 
 
 @pytest.mark.asyncio
-async def test_update_task_task_not_exist_exc(mocker, user_mock, task_mock):
+async def test_delete_task_task_not_exist_exc(mocker, user_mock, task_mock):
     session_mock = mocker.AsyncMock()
     cur_user = user_mock(1)
     task_id = 11

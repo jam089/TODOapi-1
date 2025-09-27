@@ -1,5 +1,4 @@
 import pytest
-
 from core.utils.camel_case_to_snake_case import camel_to_snake
 
 

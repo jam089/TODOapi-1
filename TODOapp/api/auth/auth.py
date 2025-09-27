@@ -1,26 +1,27 @@
 from typing import Annotated
 
+from core.config import settings
+from core.models import User, db_helper
 from fastapi import APIRouter, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.schemas import TokenInfoSchm, UserSchmExtended
 from api.auth.utils import create_access_token, create_refresh_token
-from core.config import settings
-from core.models import db_helper, User
+from api.schemas import TokenInfoSchm, UserSchmExtended
+
 from .validation import (
-    get_auth_user_from_db,
-    get_currant_auth_user_for_refresh,
-    get_currant_auth_user,
     ACCESS_TOKEN_TYPE,
     REFRESH_TOKEN_TYPE,
+    get_auth_user_from_db,
+    get_currant_auth_user,
+    get_currant_auth_user_for_refresh,
 )
 
 router = APIRouter()
 
 
 @router.post("/login/", response_model=TokenInfoSchm)
-async def auth_user(
+async def auth_user_login(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     response: Response,
@@ -44,7 +45,7 @@ async def auth_user(
     response_model=TokenInfoSchm,
     response_model_exclude_none=True,
 )
-async def auth_user(
+async def auth_user_refresh(
     user: Annotated[UserSchmExtended, Depends(get_currant_auth_user_for_refresh)],
     response: Response,
 ):
@@ -55,7 +56,7 @@ async def auth_user(
 
 
 @router.post("/logout/")
-async def auth_user(
+async def auth_user_logout(
     _current_user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
     response: Response,
 ):

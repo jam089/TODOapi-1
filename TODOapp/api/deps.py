@@ -1,16 +1,18 @@
 from typing import Annotated
 
+from core.crud import task as task_crud
+from core.crud import user as user_crud
+from core.models import Task as TaskModel
+from core.models import User as UserModel
+from core.models import db_helper
 from fastapi import Depends, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .http_exceptions import (
     rendering_exception_with_param,
-    user_id_exc_templ,
     task_id_exc_templ,
+    user_id_exc_templ,
 )
-from core.models import db_helper
-from core.models import User as UserModel, Task as TaskModel
-from core.crud import user as user_crud, task as task_crud
 
 
 async def get_user(

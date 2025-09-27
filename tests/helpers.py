@@ -1,10 +1,9 @@
 import re
 from string import Template
 
-from httpx import AsyncClient
-
 from core.config import settings
 from core.models import User
+from httpx import AsyncClient
 
 
 async def authentication(async_client: AsyncClient, user: User, password: str):

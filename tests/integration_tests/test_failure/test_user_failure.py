@@ -1,17 +1,16 @@
 import pytest
-from httpx import AsyncClient
-
-from core.config import settings
 from api.http_exceptions import (
-    rendering_exception_with_param,
-    token_invalid_exc,
     inactive_user_exception,
-    user_exception_templ,
     no_priv_except,
+    rendering_exception_with_param,
+    role_not_exist_exc_templ,
+    token_invalid_exc,
+    user_exception_templ,
     user_id_exc_templ,
     username_already_exist_exc_templ,
-    role_not_exist_exc_templ,
 )
+from core.config import settings
+from httpx import AsyncClient
 
 
 @pytest.mark.parametrize(

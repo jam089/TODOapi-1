@@ -1,16 +1,15 @@
 import pytest
-from fastapi import HTTPException
-
 from api.schemas.user import UserRoleChangeSchm
 from api.views.user import (
-    get_user_by_username,
-    get_all_user_and_by_id,
-    create_user,
     change_role,
+    create_user,
+    get_all_user_and_by_id,
+    get_user_by_username,
     update_user,
     update_yourself,
 )
 from core.config import settings
+from fastapi import HTTPException
 
 
 @pytest.mark.asyncio
@@ -141,7 +140,7 @@ async def test_create_user_user_already_exist_exc(mocker, user_mock):
 
 
 @pytest.mark.asyncio
-async def test_create_user_success(mocker, user_mock):
+async def test_change_role_success(mocker, user_mock):
     cur_user = user_mock(2)
     expect_user = user_mock(0)
     session_mock = mocker.AsyncMock()
@@ -156,7 +155,7 @@ async def test_create_user_success(mocker, user_mock):
 
 
 @pytest.mark.asyncio
-async def test_create_user_role_not_exist_exc(mocker, user_mock):
+async def test_change_role_role_not_exist_exc(mocker, user_mock):
     cur_user = user_mock(2)
     expect_user = user_mock(0)
     session_mock = mocker.AsyncMock()

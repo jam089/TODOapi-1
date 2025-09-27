@@ -1,24 +1,25 @@
-from typing import Sequence, Annotated, Union
+from collections.abc import Sequence
+from typing import Annotated
 
+from core.config import settings
+from core.crud import user
+from core.models import User as UserModel
+from core.models import db_helper
 from fastapi import APIRouter, Depends, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.auth.validation import get_currant_auth_user, get_currant_auth_user_with_admin
-from api.schemas import UserSchm, UserSchmExtended, CreateUserSchm, UpdateUserSchm
 from api import deps
-from api.schemas.user import UserPassChangeSchm, UserRoleChangeSchm
+from api.auth.validation import get_currant_auth_user, get_currant_auth_user_with_admin
 from api.http_exceptions import (
-    rendering_exception_with_param,
-    username_already_exist_exc_templ,
-    role_not_exist_exc_templ,
-    user_id_exc_templ,
     no_priv_except,
+    rendering_exception_with_param,
+    role_not_exist_exc_templ,
     user_exception_templ,
+    user_id_exc_templ,
+    username_already_exist_exc_templ,
 )
-from core.config import settings
-from core.models import db_helper
-from core.models import User as UserModel
-from core.crud import user
+from api.schemas import CreateUserSchm, UpdateUserSchm, UserSchm, UserSchmExtended
+from api.schemas.user import UserPassChangeSchm, UserRoleChangeSchm
 
 router = APIRouter()
 
@@ -53,10 +54,7 @@ async def get_user_by_username(
 
 @router.get(
     "/",
-    response_model=Union[
-        UserSchmExtended,
-        Sequence[UserSchm],
-    ],
+    response_model=UserSchmExtended | Sequence[UserSchm],
     summary="Get All User Or Get User By Id",
     description=f"Authentication is required for request for all users (without query id) or<br>"
     f"Authentication and {settings.roles.admin} role is required for specific user",
