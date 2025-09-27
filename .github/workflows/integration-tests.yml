@@ -11,16 +11,22 @@ jobs:
       postgres:
         image: postgres:16.8
         ports:
-          - 5434:5432
+          - 5432:5432
         env:
           POSTGRES_USER: ${{ secrets.TODO_TEST_POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.TODO_TEST_POSTGRES_PASSWORDS }}
           POSTGRES_DB: ${{ secrets.TODO_TEST_POSTGRES_DB }}
         options: >-
-          --health-cmd "pg_isready"
+          --health-cmd "pg_isready -U $$POSTGRES_USER"
           --health-interval 5s
           --health-timeout 3s
           --health-retries 3
+    env:
+      TODOAPP__DB__URL: ${{ secrets.TODO_TEST_DATABASE_URL }}
+      TODOAPP__DB__ECHO: 0
+      TODOAPP__DB__ECHO_POOL: 0
+      TODOAPP__DB__MODE: TEST
+      TODOAPP__RUN__RELOAD: 1
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,11 +35,12 @@ jobs:
         run: |
           pip install "poetry==2.1.2"
           poetry install --with dev
-      - name: Run integration tests
+      - name: Run pretest script
         run: |
-          chmod +x tests/test_prestart.sh
-          tests/test_prestart.sh
-          poetry run pytest tests/integration_tests -v --junitxml=pytest-results.xml
+          chmod +x ./tests/test_prestart.sh
+          ./tests/test_prestart.sh
+      - name: Run integration tests
+        run: poetry run pytest tests/integration_tests -v --junitxml=pytest-results.xml
       - name: Mark repo as safe
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
       - name: Upload test results
@@ -48,9 +55,3 @@ jobs:
           name: Pytest Results
           path: pytest-results.xml
           reporter: java-junit
-        env:
-          TODOAPP__DB__URL: ${{ secrets.TODO_TEST_DATABASE_URL }}
-          TODOAPP__DB__ECHO: 0
-          TODOAPP__DB__ECHO_POOL: 0
-          TODOAPP__DB__MODE: TEST
-          TODOAPP__RUN__RELOAD: 1
