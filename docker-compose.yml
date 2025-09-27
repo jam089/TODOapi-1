@@ -34,7 +34,7 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    profiles: ["dev"]
+    profiles: ["dev", "test"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 5s

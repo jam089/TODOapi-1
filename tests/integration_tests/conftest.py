@@ -11,6 +11,16 @@ from integration_tests.create_update_scenarios import (
 from integration_tests.factories import TaskFactory
 
 from tests.helpers import authentication
+from tests.integration_tests.database import (
+    async_client,  # noqa: F401
+    auth_client,  # noqa: F401
+    override_dispose,  # noqa: F401
+    override_session_getter,  # noqa: F401
+    prepare_db,  # noqa: F401
+    pytest_addoption,  # noqa: F401
+    pytest_configure,  # noqa: F401
+    test_session,  # noqa: F401
+)
 from tests.integration_tests.factories import UserFactory, create
 
 

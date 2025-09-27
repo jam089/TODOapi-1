@@ -55,3 +55,6 @@ ignore = ["E501"]
 [tool.ruff.format]
 quote-style = "double"
 
+[tool.ruff.lint.per-file-ignores]
+"tests/integration_tests/conftest.py" = ["F811"]
+
