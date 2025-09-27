@@ -70,7 +70,7 @@ async def get_all_user_and_by_id(
     if user_id is not None:
         if current_user.role != settings.roles.admin:
             raise no_priv_except
-        user_by_id: UpdateUserSchm | None = await user.get_user_by_id(session, user_id)
+        user_by_id: UserModel | None = await user.get_user_by_id(session, user_id)
         if user_by_id:
             return user_by_id
         raise rendering_exception_with_param(user_id_exc_templ, str(user_id))
@@ -109,12 +109,14 @@ async def change_your_password(
         Depends(get_currant_auth_user),
     ],
 ):
-    user_to_update = await user.get_user_by_id(session, current_user.id)
-    return await user.update_password(
-        session=session,
-        user_to_update=user_to_update,
-        password=new_password.password,
-    )
+
+    if user_to_update := await user.get_user_by_id(session, current_user.id):
+        return await user.update_password(
+            session=session,
+            user_to_update=user_to_update,
+            password=new_password.password,
+        )
+    raise rendering_exception_with_param(user_id_exc_templ, str(current_user.id))
 
 
 @router.patch(
@@ -156,12 +158,14 @@ async def update_user(
         Depends(get_currant_auth_user_with_admin),
     ],
 ):
-    if not await user.get_user_by_username(session, user_input.username):
-        return await user.update_user(session, user_to_update, user_input)
-    raise rendering_exception_with_param(
-        username_already_exist_exc_templ,
-        user_input.username,
-    )
+    if (username := user_input.username) and await user.get_user_by_username(
+        session, username
+    ):
+        raise rendering_exception_with_param(
+            username_already_exist_exc_templ,
+            username,
+        )
+    return await user.update_user(session, user_to_update, user_input)
 
 
 @router.patch(
@@ -178,12 +182,16 @@ async def update_yourself(
     ],
 ):
     user_to_update = await user.get_user_by_id(session, current_user.id)
-    if not await user.get_user_by_username(session, user_input.username):
+    if (username := user_input.username) and await user.get_user_by_username(
+        session, username
+    ):
+        raise rendering_exception_with_param(
+            username_already_exist_exc_templ,
+            username,
+        )
+    if user_to_update:
         return await user.update_user(session, user_to_update, user_input)
-    raise rendering_exception_with_param(
-        username_already_exist_exc_templ,
-        user_input.username,
-    )
+    raise rendering_exception_with_param(user_id_exc_templ, str(current_user.id))
 
 
 @router.delete(
@@ -211,5 +219,8 @@ async def delete_yourself(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     current_user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
 ) -> None:
-    user_in_db: UserModel = await user.get_user_by_id(session, current_user.id)
-    await user.delete_user(session, user_in_db)
+    user_in_db = await user.get_user_by_id(session, current_user.id)
+    if user_in_db:
+        await user.delete_user(session, user_in_db)
+    else:
+        raise rendering_exception_with_param(user_id_exc_templ, str(current_user.id))

@@ -2,15 +2,14 @@ import pytest
 from core.config import settings
 from core.utils.jwt import hash_password
 from factory.faker import faker
-from integration_tests.create_update_scenarios import (
+
+from tests.helpers import authentication
+from tests.integration_tests.create_update_scenarios import (
     create_tasks,
     create_users,
     update_task_scenarios,
     update_user_scenarios,
 )
-from integration_tests.factories import TaskFactory
-
-from tests.helpers import authentication
 from tests.integration_tests.database import (
     async_client,  # noqa: F401
     auth_client,  # noqa: F401
@@ -21,7 +20,7 @@ from tests.integration_tests.database import (
     pytest_configure,  # noqa: F401
     test_session,  # noqa: F401
 )
-from tests.integration_tests.factories import UserFactory, create
+from tests.integration_tests.factories import TaskFactory, UserFactory, create
 
 
 @pytest.fixture

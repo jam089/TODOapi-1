@@ -51,7 +51,7 @@ async def test_endpoint_search_task_by_parameters(
     test_multiple_tasks: dict,
     search_attr_list,
 ):
-    task = test_multiple_tasks.get("task_list")[0]
+    task = test_multiple_tasks["task_list"][0]
     params = {}
 
     for key in search_attr_list:
@@ -98,7 +98,7 @@ async def test_endpoint_get_task_by_user_id(
     test_task: dict,
 ):
     response = await async_client.get(
-        url=f"{settings.api.task.prefix}/by-user/{test_task.get("task").user_id}/",
+        url=f"{settings.api.task.prefix}/by-user/{test_task["task"].user_id}/",
         headers=admin_user.get("headers"),
     )
     assert response.status_code == 200
@@ -122,7 +122,7 @@ async def test_endpoint_get_user_all_tasks(
     assert response.status_code == 200
     expected = [
         TaskSchm.model_validate(t).model_dump(mode="json")
-        for t in test_multiple_tasks.get("task_list")
+        for t in test_multiple_tasks["task_list"]
     ]
     assert response.json() == expected
 
@@ -135,23 +135,21 @@ async def test_endpoint_get_task_by_task_id(
     test_task: dict,
 ):
     response = await async_client.get(
-        url=f"{settings.api.task.prefix}/{test_task.get("task").id}/",
+        url=f"{settings.api.task.prefix}/{test_task["task"].id}/",
         headers=admin_user.get("headers"),
     )
     assert response.status_code == 200
-    assert response.json().get("name") == test_task.get("task").name
-    assert response.json().get("description") == test_task.get("task").description
-    assert response.json().get("start_at") == test_task.get("task").start_at.strftime(
+    assert response.json().get("name") == test_task["task"].name
+    assert response.json().get("description") == test_task["task"].description
+    assert response.json().get("start_at") == test_task["task"].start_at.strftime(
         "%Y-%m-%dT%H:%M:%S.%fZ"
     )
-    assert response.json().get("end_at") == test_task.get("task").end_at.strftime(
+    assert response.json().get("end_at") == test_task["task"].end_at.strftime(
         "%Y-%m-%dT%H:%M:%S.%fZ"
     )
-    assert (
-        response.json().get("scheduled_hours") == test_task.get("task").scheduled_hours
-    )
-    assert response.json().get("status") == test_task.get("task").status
-    assert response.json().get("user_id") == test_task.get("task").user_id
+    assert response.json().get("scheduled_hours") == test_task["task"].scheduled_hours
+    assert response.json().get("status") == test_task["task"].status
+    assert response.json().get("user_id") == test_task["task"].user_id
 
 
 @pytest.mark.asyncio
@@ -169,11 +167,11 @@ async def test_endpoint_create_task(
     assert response.json().get("name") == test_task_to_create.get("name")
     assert response.json().get("description") == test_task_to_create.get("description")
     assert datetime.fromisoformat(
-        response.json().get("start_at")
-    ) == datetime.fromisoformat(test_task_to_create.get("start_at"))
-    assert datetime.fromisoformat(
-        response.json().get("end_at")
-    ) == datetime.fromisoformat(test_task_to_create.get("end_at"))
+        response.json()["start_at"]
+    ) == datetime.fromisoformat(test_task_to_create["start_at"])
+    assert datetime.fromisoformat(response.json()["end_at"]) == datetime.fromisoformat(
+        test_task_to_create["end_at"]
+    )
     assert response.json().get("scheduled_hours") == test_task_to_create.get(
         "scheduled_hours"
     )
@@ -185,16 +183,16 @@ async def test_endpoint_change_task_owner_by_user(
     test_task: dict,
     test_user_c: dict,
 ):
-    new_user_id = test_user_c.get("user").id
-    old_user_id = test_task.get("user").id
+    new_user_id = test_user_c["user"].id
+    old_user_id = test_task["user"].id
     response = await async_client.patch(
-        url=f"{settings.api.task.prefix}/{test_task.get("task").id}/change_owner/",
+        url=f"{settings.api.task.prefix}/{test_task["task"].id}/change_owner/",
         headers=test_task.get("headers"),
         params={"user_id": new_user_id},
     )
     assert response.status_code == 200
-    assert response.json().get("name") == test_task.get("task").name
-    assert response.json().get("id") == test_task.get("task").id
+    assert response.json().get("name") == test_task["task"].name
+    assert response.json().get("id") == test_task["task"].id
     assert response.json().get("user_id") == new_user_id
     assert response.json().get("user_id") != old_user_id
 
@@ -206,16 +204,16 @@ async def test_endpoint_change_task_owner_by_admin(
     test_task: dict,
     test_user_c: dict,
 ):
-    new_user_id = test_user_c.get("user").id
-    old_user_id = test_task.get("user").id
+    new_user_id = test_user_c["user"].id
+    old_user_id = test_task["user"].id
     response = await async_client.patch(
-        url=f"{settings.api.task.prefix}/{test_task.get("task").id}/change_owner/",
+        url=f"{settings.api.task.prefix}/{test_task["task"].id}/change_owner/",
         headers=admin_user.get("headers"),
         params={"user_id": new_user_id},
     )
     assert response.status_code == 200
-    assert response.json().get("name") == test_task.get("task").name
-    assert response.json().get("id") == test_task.get("task").id
+    assert response.json().get("name") == test_task["task"].name
+    assert response.json().get("id") == test_task["task"].id
     assert response.json().get("user_id") == new_user_id
     assert response.json().get("user_id") != old_user_id
 
@@ -225,9 +223,9 @@ async def test_endpoint_update_task_by_user(
     async_client: AsyncClient,
     test_task: dict,
 ):
-    update_scenario = test_task.get("update_scenarios").get("user")
+    update_scenario = test_task["update_scenarios"].get("user")
     response = await async_client.patch(
-        url=f"{settings.api.task.prefix}/{test_task.get("task").id}/",
+        url=f"{settings.api.task.prefix}/{test_task["task"].id}/",
         headers=test_task.get("headers"),
         json=update_scenario,
     )
@@ -248,9 +246,9 @@ async def test_endpoint_update_task_by_admin(
     admin_user: dict,
     test_task: dict,
 ):
-    update_scenario = test_task.get("update_scenarios").get("admin")
+    update_scenario = test_task["update_scenarios"].get("admin")
     response = await async_client.patch(
-        url=f"{settings.api.task.prefix}/{test_task.get("task").id}/",
+        url=f"{settings.api.task.prefix}/{test_task["task"].id}/",
         headers=admin_user.get("headers"),
         json=update_scenario,
     )
@@ -271,7 +269,7 @@ async def test_endpoint_delete_task_by_user(
     test_task: dict,
 ):
     response = await async_client.delete(
-        url=f"{settings.api.task.prefix}/{test_task.get("task").id}/",
+        url=f"{settings.api.task.prefix}/{test_task["task"].id}/",
         headers=test_task.get("headers"),
     )
     assert response.status_code == 204
@@ -284,7 +282,7 @@ async def test_endpoint_delete_task_by_admin(
     test_task: dict,
 ):
     response = await async_client.delete(
-        url=f"{settings.api.task.prefix}/{test_task.get("task").id}/",
+        url=f"{settings.api.task.prefix}/{test_task["task"].id}/",
         headers=admin_user.get("headers"),
     )
     assert response.status_code == 204

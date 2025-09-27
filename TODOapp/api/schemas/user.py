@@ -4,12 +4,12 @@ from pydantic import BaseModel, ConfigDict
 
 
 class BaseUser(BaseModel):
-    username: str
     name: str | None = None
     b_date: date | None = None
 
 
 class CreateUserSchm(BaseUser):
+    username: str
     password: str | bytes
 
 
@@ -25,6 +25,7 @@ class UserSchm(BaseUser):
 
     id: int
     active: bool
+    username: str
 
 
 class UserSchmExtended(UserSchm):

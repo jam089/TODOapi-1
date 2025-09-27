@@ -1,4 +1,5 @@
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import bcrypt
 import jwt
@@ -31,8 +32,8 @@ def decode_jwt(
     token: str | bytes,
     public_key: str = settings.api.auth_jwt.public_key_path.read_text(),
     algorithm: str = settings.api.auth_jwt.algorithm,
-) -> dict:
-    decoded = jwt.decode(
+) -> dict[str, Any]:
+    decoded: dict[str, Any] = jwt.decode(
         jwt=token,
         key=public_key,
         algorithms=[algorithm],
@@ -41,9 +42,11 @@ def decode_jwt(
 
 
 def hash_password(
-    password: str,
+    password: str | bytes,
 ) -> bytes:
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    if isinstance(password, str):
+        password = password.encode()
+    return bcrypt.hashpw(password, bcrypt.gensalt())
 
 
 def check_password(

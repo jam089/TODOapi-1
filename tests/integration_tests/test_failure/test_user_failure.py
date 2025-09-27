@@ -215,11 +215,11 @@ async def test_endpoint_update_yourself(
     expected_code,
     expected_details,
 ):
-    json = mutated_user.get("update_user_scenarios")
+    json = mutated_user["update_user_scenarios"]
     if mutated_user.get("json_none"):
         json = None
     elif mutated_user.get("user_already_exist"):
-        json.update({"username": admin_user.get("user").username})
+        json.update({"username": admin_user["user"].username})
     response = await async_client.patch(
         url=f"{settings.api.user.prefix}/",
         json=json,
@@ -360,12 +360,10 @@ async def test_admin_endpoint_change_role(
     )
     assert response.status_code == expected_code
     if expected_details == user_id_exc_templ.detail:
-        exc = rendering_exception_with_param(user_id_exc_templ, wrong_user_id)
+        exc = rendering_exception_with_param(user_id_exc_templ, user_to_update)
         assert response.json().get("detail") == exc.detail
     elif expected_details == role_not_exist_exc_templ.detail:
-        exc = rendering_exception_with_param(
-            role_not_exist_exc_templ, wrong_role_to_request
-        )
+        exc = rendering_exception_with_param(role_not_exist_exc_templ, role_for_update)
         assert response.json().get("detail") == exc.detail
     elif expected_details is None:
         ...
@@ -417,8 +415,8 @@ async def test_admin_endpoint_update_user(
     wrong_user_id = mutated_admin.get("wrong_user_id_to_request")
     update_scenario = test_user.get("update_user_scenarios").get("admin")
     json = None if mutated_admin.get("json_none") else update_scenario
-    if mutated_admin.get("user_already_exist"):
-        json.update({"username": mutated_admin.get("user").username})
+    if mutated_admin.get("user_already_exist") and json is not None:
+        json.update({"username": mutated_admin["user"].username})
     user_to_update = wrong_user_id if wrong_user_id else test_user.get("user").id
     response = await async_client.patch(
         url=f"{settings.api.user.prefix}/{user_to_update}/",
@@ -427,7 +425,7 @@ async def test_admin_endpoint_update_user(
     )
     assert response.status_code == expected_code
     if expected_details == user_id_exc_templ.detail:
-        exc = rendering_exception_with_param(user_id_exc_templ, wrong_user_id)
+        exc = rendering_exception_with_param(user_id_exc_templ, user_to_update)
         assert response.json().get("detail") == exc.detail
     elif expected_details == username_already_exist_exc_templ.detail:
         exc = rendering_exception_with_param(
@@ -483,7 +481,7 @@ async def test_admin_endpoint_delete_user(
     )
     assert response.status_code == expected_code
     if expected_details == user_id_exc_templ.detail:
-        exc = rendering_exception_with_param(user_id_exc_templ, wrong_user_id)
+        exc = rendering_exception_with_param(user_id_exc_templ, user_to_update)
         assert response.json().get("detail") == exc.detail
     else:
         assert response.json().get("detail") == expected_details

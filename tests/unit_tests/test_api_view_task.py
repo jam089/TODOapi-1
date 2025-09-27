@@ -184,9 +184,9 @@ async def test_delete_task_success(mocker, user_mock, task_mock, cur_user_id):
     )
     mocker.patch(
         "api.views.task.crud.delete_task",
+        new=mocker.AsyncMock(return_value=None),
     )
-    result = await delete_task(session_mock, task_id, cur_user)
-    assert result is None
+    assert await delete_task(session_mock, task_id, cur_user) is None
 
 
 @pytest.mark.asyncio

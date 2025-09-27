@@ -36,7 +36,7 @@ async def get_user_from_payload(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     payload: dict,
 ) -> UserSchmExtended:
-    user_id: int | None = payload.get("sub")
+    user_id: int = payload["sub"]
     if user := await get_user_by_id(session, user_id):
         if not user.active:
             raise inactive_user_exception
@@ -92,7 +92,7 @@ async def get_auth_user_from_db(
     username: str,
     password: str,
 ) -> User:
-    user: User = await get_user_by_username(
+    user: User | None = await get_user_by_username(
         session=session,
         username=username,
     )

@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from core.models import User
 from httpx import AsyncClient
@@ -40,9 +42,9 @@ async def mutated(
     target = wrong_param.get("target")
 
     if target == "user":
-        user_obj: User = obj_dict.get("user")
+        user_obj: User = obj_dict["user"]
         user_obj = await test_session.merge(user_obj)
-        attrs: dict = wrong_param.get("attrs")
+        attrs: dict[str, Any] = wrong_param["attrs"]
         await test_session.refresh(user_obj)
         for attr, value in attrs.items():
             setattr(user_obj, attr, value)
@@ -50,7 +52,7 @@ async def mutated(
         await test_session.refresh(user_obj)
         if "role" in attrs:
             new_auth_info = await authentication(
-                async_client, user_obj, obj_dict.get("password")
+                async_client, user_obj, obj_dict["password"]
             )
             obj_dict.update(new_auth_info)
 

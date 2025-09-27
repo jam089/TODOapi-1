@@ -123,7 +123,7 @@ async def change_task_owner(
     user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
     new_user: Annotated[UserModel, Depends(deps.get_user)],
 ):
-    task_to_update: Task = await crud.get_task_by_id(session, task_id)
+    task_to_update: Task | None = await crud.get_task_by_id(session, task_id)
     if task_to_update is None:
         raise rendering_exception_with_param(task_id_exc_templ, str(task_id))
     if task_to_update.user_id == user.id or user.role == settings.roles.admin:
@@ -156,7 +156,7 @@ async def update_task(
             status_exception_templ,
             task_input.status,
         )
-    task_to_update: Task = await crud.get_task_by_id(session, task_id)
+    task_to_update: Task | None = await crud.get_task_by_id(session, task_id)
     if task_to_update is None:
         raise rendering_exception_with_param(task_id_exc_templ, str(task_id))
     if task_to_update.user_id == user.id or user.role == settings.roles.admin:
@@ -174,11 +174,11 @@ async def delete_task(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     task_id: int,
     user: Annotated[UserSchmExtended, Depends(get_currant_auth_user)],
-) -> None:
-    task_to_delete: Task = await crud.get_task_by_id(session, task_id)
+):
+    task_to_delete: Task | None = await crud.get_task_by_id(session, task_id)
     if task_to_delete is None:
         raise rendering_exception_with_param(task_id_exc_templ, str(task_id))
     if task_to_delete.user_id == user.id or user.role == settings.roles.admin:
         await crud.delete_task(session, task_to_delete)
-        return None
+        return
     raise no_priv_except

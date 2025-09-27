@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from datetime import datetime
 from typing import Any
 
@@ -23,7 +24,7 @@ def jwt_payload_example():
 
 @pytest.fixture(scope="package")
 def user_mock():
-    user_list = [
+    user_list: Sequence[User] = [
         User(
             id=0,
             username="test_user_0",

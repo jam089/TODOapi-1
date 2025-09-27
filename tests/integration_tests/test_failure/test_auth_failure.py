@@ -40,7 +40,7 @@ async def test_endpoint_auth_user_login(
     wrong_pass = mutated_user.get("wrong_password")
     wrong_username = mutated_user.get("wrong_username")
     password = wrong_pass if wrong_pass else mutated_user.get("password")
-    username = wrong_username if wrong_username else mutated_user.get("user").username
+    username = wrong_username if wrong_username else mutated_user["user"].username
     login_data = {
         "username": username,
         "password": password,
@@ -87,7 +87,7 @@ async def test_endpoint_auth_user_refresh(
     expected_code,
     expected_details,
 ):
-    cookies_dict = {"refresh_token": mutated_user.get("refresh_token")}
+    cookies_dict = {"refresh_token": mutated_user["refresh_token"]}
     cookies = None if mutated_user.get("headers") is None else cookies_dict
     if cookies:
         async_client.cookies.update(cookies)

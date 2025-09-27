@@ -24,6 +24,7 @@ async def check_and_create_superuser(
 
     await create_user(session, admin)
     admin_user = await get_user_by_id(session, admin_id)
-    await update_role(session, admin_user, role=settings.roles.admin)
+    if admin_user:
+        await update_role(session, admin_user, role=settings.roles.admin)
 
     return "admin created"

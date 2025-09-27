@@ -1,4 +1,3 @@
-
 import pytest
 from api.http_exceptions import (
     inactive_user_exception,
@@ -94,17 +93,16 @@ async def test_endpoint_search_task_by_parameters(
     expected_code,
     expected_details,
 ):
-    task = test_multiple_tasks.get("task_list")[2]
+    task = test_multiple_tasks["task_list"][2]
     wrong_json = mutated_user.get("wrong_json")
     wrong_status = mutated_user.get("wrong_status")
-    if mutated_user.get("json_none"):
-        params = None
-    elif wrong_json:
-        params = wrong_json
+    if wrong_json:
+        json = wrong_json
     elif wrong_status:
-        params = wrong_status
+        json = wrong_status
     else:
-        params = {"name": task.name, "user_id": task.user_id}
+        json = {"name": task.name, "user_id": task.user_id}
+    params = None if mutated_user.get("json_none") else json
     response = await async_client.get(
         url=f"{settings.api.task.prefix}/search/",
         params=params,
@@ -112,9 +110,7 @@ async def test_endpoint_search_task_by_parameters(
     )
     assert response.status_code == expected_code
     if expected_details == status_exception_templ.detail:
-        exc = rendering_exception_with_param(
-            status_exception_templ, wrong_status.get("status")
-        )
+        exc = rendering_exception_with_param(status_exception_templ, json.get("status"))
         assert response.json().get("detail") == exc.detail
     elif not expected_details:
         ...
@@ -159,14 +155,14 @@ async def test_endpoint_get_task_by_user_id(
     expected_details,
 ):
     wrong_user_id = mutated_admin.get("user_id_for_task")
-    user_id = wrong_user_id if wrong_user_id else test_task.get("task").user_id
+    user_id = wrong_user_id if wrong_user_id else test_task["task"].user_id
     response = await async_client.get(
         url=f"{settings.api.task.prefix}/by-user/{user_id}/",
         headers=mutated_admin.get("headers"),
     )
     assert response.status_code == expected_code
     if expected_details == user_id_exc_templ.detail:
-        exc = rendering_exception_with_param(user_id_exc_templ, wrong_user_id)
+        exc = rendering_exception_with_param(user_id_exc_templ, user_id)
         assert response.json().get("detail") == exc.detail
     else:
         assert response.json().get("detail") == expected_details
@@ -241,14 +237,14 @@ async def test_endpoint_get_task_by_task_id(
     expected_details,
 ):
     wrong_task_id = mutated_admin.get("task_id_for_task")
-    task_id = wrong_task_id if wrong_task_id else test_task.get("task").id
+    task_id = wrong_task_id if wrong_task_id else test_task["task"].id
     response = await async_client.get(
         url=f"{settings.api.task.prefix}/{task_id}/",
         headers=mutated_admin.get("headers"),
     )
     assert response.status_code == expected_code
     if expected_details == task_id_exc_templ.detail:
-        exc = rendering_exception_with_param(task_id_exc_templ, wrong_task_id)
+        exc = rendering_exception_with_param(task_id_exc_templ, task_id)
         assert response.json().get("detail") == exc.detail
     else:
         assert response.json().get("detail") == expected_details
@@ -351,14 +347,15 @@ async def test_endpoint_change_task_owner_by_user(
     expected_code,
     expected_details,
 ):
-    new_user_id = test_user_c.get("user").id
+    new_user_id = test_user_c["user"].id
     wrong_task = mutated_task.get("wrong_json")
     wrong_user_id = mutated_task.get("user_id_for_task")
     task_to_create = wrong_task if wrong_task else {"user_id": new_user_id}
+    check_task_id = wrong_user_id if wrong_user_id else ""
     task_to_create = {"user_id": wrong_user_id} if wrong_user_id else task_to_create
     json = None if mutated_task.get("json_none") else task_to_create
     wrong_task_id = mutated_task.get("task_id_for_task")
-    task_id = wrong_task_id if wrong_task_id else mutated_task.get("task").id
+    task_id = wrong_task_id if wrong_task_id else mutated_task["task"].id
     response = await async_client.patch(
         url=f"{settings.api.task.prefix}/{task_id}/change_owner/",
         headers=mutated_task.get("headers"),
@@ -366,10 +363,10 @@ async def test_endpoint_change_task_owner_by_user(
     )
     assert response.status_code == expected_code
     if expected_details == task_id_exc_templ.detail:
-        exc = rendering_exception_with_param(task_id_exc_templ, wrong_task_id)
+        exc = rendering_exception_with_param(task_id_exc_templ, task_id)
         assert response.json().get("detail") == exc.detail
     elif expected_details == user_id_exc_templ.detail:
-        exc = rendering_exception_with_param(user_id_exc_templ, wrong_user_id)
+        exc = rendering_exception_with_param(user_id_exc_templ, check_task_id)
         assert response.json().get("detail") == exc.detail
     elif not expected_details:
         ...
@@ -408,9 +405,9 @@ async def test_endpoint_change_task_owner_by_admin(
     expected_code,
     expected_details,
 ):
-    new_user_id = test_user_c.get("user").id
+    new_user_id = test_user_c["user"].id
     response = await async_client.patch(
-        url=f"{settings.api.task.prefix}/{test_task.get("task").id}/change_owner/",
+        url=f"{settings.api.task.prefix}/{test_task["task"].id}/change_owner/",
         headers=mutated_admin.get("headers"),
         params={"user_id": new_user_id},
     )
@@ -464,9 +461,10 @@ async def test_endpoint_update_task_by_user(
     expected_code,
     expected_details,
 ):
-    update_scenario = mutated_task.get("update_scenarios").get("user")
+    update_scenario = mutated_task["update_scenarios"].get("user")
     wrong_task = mutated_task.get("wrong_json")
     wrong_status = mutated_task.get("wrong_status")
+    check_status = wrong_status["status"] if wrong_status else ""
     wrong_task_id = mutated_task.get("task_id_for_task")
     if wrong_status:
         json = wrong_status
@@ -476,7 +474,7 @@ async def test_endpoint_update_task_by_user(
         json = None
     else:
         json = update_scenario
-    task_id = wrong_task_id if wrong_task_id else mutated_task.get("task").id
+    task_id = wrong_task_id if wrong_task_id else mutated_task["task"].id
     response = await async_client.patch(
         url=f"{settings.api.task.prefix}/{task_id}/",
         headers=mutated_task.get("headers"),
@@ -484,12 +482,10 @@ async def test_endpoint_update_task_by_user(
     )
     assert response.status_code == expected_code
     if expected_details == task_id_exc_templ.detail:
-        exc = rendering_exception_with_param(task_id_exc_templ, wrong_task_id)
+        exc = rendering_exception_with_param(task_id_exc_templ, task_id)
         assert response.json().get("detail") == exc.detail
     elif expected_details == status_exception_templ.detail:
-        exc = rendering_exception_with_param(
-            status_exception_templ, wrong_status.get("status")
-        )
+        exc = rendering_exception_with_param(status_exception_templ, check_status)
         assert response.json().get("detail") == exc.detail
     elif not expected_details:
         ...
@@ -527,9 +523,9 @@ async def test_endpoint_update_task_by_admin(
     expected_code,
     expected_details,
 ):
-    update_scenario = test_task.get("update_scenarios").get("admin")
+    update_scenario = test_task["update_scenarios"].get("admin")
     response = await async_client.patch(
-        url=f"{settings.api.task.prefix}/{test_task.get("task").id}/",
+        url=f"{settings.api.task.prefix}/{test_task["task"].id}/",
         headers=mutated_admin.get("headers"),
         json=update_scenario,
     )
@@ -567,14 +563,14 @@ async def test_endpoint_delete_task_by_user(
     expected_details,
 ):
     wrong_task = mutated_task.get("task_id_for_task")
-    task = wrong_task if wrong_task else mutated_task.get("task").id
+    task = wrong_task if wrong_task else mutated_task["task"].id
     response = await async_client.delete(
         url=f"{settings.api.task.prefix}/{task}/",
         headers=mutated_task.get("headers"),
     )
     assert response.status_code == expected_code
     if expected_details == task_id_exc_templ.detail:
-        exc = rendering_exception_with_param(task_id_exc_templ, wrong_task)
+        exc = rendering_exception_with_param(task_id_exc_templ, task)
         assert response.json().get("detail") == exc.detail
     else:
         assert response.json().get("detail") == expected_details
@@ -611,7 +607,7 @@ async def test_endpoint_delete_task_by_admin(
     expected_details,
 ):
     response = await async_client.delete(
-        url=f"{settings.api.task.prefix}/{test_task.get("task").id}/",
+        url=f"{settings.api.task.prefix}/{test_task["task"].id}/",
         headers=mutated_admin.get("headers"),
     )
     assert response.status_code == expected_code
