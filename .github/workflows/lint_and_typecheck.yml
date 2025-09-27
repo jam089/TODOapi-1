@@ -1,0 +1,23 @@
+name: Lint and typecheck
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    container: python:3.12.10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install deps
+        run: |
+          pip install poetry
+          poetry install --with dev
+
+      - name: Black checking
+        run: poetry run black --check .
+
+      - name: Ruff checking
+        run: poetry run ruff check .
+
+      - name: MyPy checking
+        run: poetry run mypy .
