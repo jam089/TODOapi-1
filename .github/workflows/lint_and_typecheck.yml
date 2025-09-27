@@ -17,7 +17,7 @@ jobs:
         run: poetry run black --check .
 
       - name: Ruff checking
-        run: poetry run ruff check .
+        run: poetry run ruff check . --output-format=github
 
       - name: MyPy checking
-        run: poetry run mypy .
+        run: poetry run mypy . --error-format=github
