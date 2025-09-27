@@ -13,6 +13,10 @@ jobs:
           pip install poetry
           poetry install --with dev
 
+      - uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
       - name: Black checking
         run: poetry run black --check .
 
@@ -20,6 +24,10 @@ jobs:
         run: poetry run ruff check . --output-format=github
 
       - name: MyPy checking
-        uses: jpetrucciani/mypy-check@1.14.1
+        run: poetry run mypy . --junit-xml=mypy-report.xml
+
+      - name: Upload test report
+        uses: mikepenz/action-junit-report@v5
         with:
-          path: '.'
+          report_paths: mypy-report.xml
+          require_tests: true
