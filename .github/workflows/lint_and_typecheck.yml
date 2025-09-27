@@ -20,4 +20,6 @@ jobs:
         run: poetry run ruff check . --output-format=github
 
       - name: MyPy checking
-        run: poetry run mypy . --error-format=github
+        uses: jpetrucciani/mypy-check@1.14.1
+        with:
+          path: '.'
