@@ -32,6 +32,7 @@ pytest-mock = "^3.14.1"
 pytest-asyncio = "^1.0.0"
 factory-boy = "^3.3.3"
 faker = "^37.5.3"
+ruff = "^0.13.2"
 
 [tool.pytest.ini_options]
 pythonpath = [
@@ -42,4 +43,15 @@ env_files = [
     ".env.test",
 ]
 asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
 
