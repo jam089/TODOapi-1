@@ -7,6 +7,7 @@ on:
       - .github/workflows
       - tests/integration_tests/
   pull_request:
+  workflow_dispatch:
 
 jobs:
   unit:
